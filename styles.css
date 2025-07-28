@@ -1,0 +1,53 @@
+* {
+    margin: 0;
+}
+
+body {
+    height: 100vh;
+    background-color: #222;
+    display: grid;
+    justify-content: center;
+    align-content: center;
+}
+
+#arcade {
+    background-color: #339;
+    box-shadow: #000 0 0 3rem;
+
+    width: 64rem;
+    height: 32rem;
+    box-sizing: border-box;
+
+    display: grid;
+    grid-template-rows: 1fr 8rem;
+    padding: 2rem;
+    gap: 2rem;
+}
+
+#arcade > * {
+    background-color: #113;
+    box-shadow: #000 inset 0 0 1rem;
+}
+
+#screen, #arrow-board {
+    display: flex;
+    padding: 2rem;
+    gap: 1rem;
+    overflow: hidden;
+}
+
+img {
+    image-rendering: pixelated;
+}
+
+.correct, .incorrect {
+    outline: 4px solid;
+}
+
+.correct {
+    outline-color: lime;
+}
+
+.incorrect {
+    outline-color: red;
+}

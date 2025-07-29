@@ -1,31 +1,45 @@
 let targetInput = [];
 const currentInput = [];
+let keyListenerActive = false;
 
 const board = document.getElementById("arrow-board");
+addEventListener("keypress", handleKeyPress);
 
 function handleKeyPress(keyEvent) {
+    if (!keyListenerActive) {
+        return;
+    } else {
+        keyListenerActive = false;
+    }
+
     const key = keyEvent.key;
     if (!["w", "a", "s", "d"].includes(key)) {
         return;
     }
+
     addInput(key);
 }
 
 function addInput(key) {
     const currentIndex = currentInput.length;
     currentInput.push(key);
+    let sfx;
     if (currentInput[currentIndex] === targetInput[currentIndex]) {
+        sfx = "arrowComplete"
         processCorrectInput(currentIndex);
     } else {
+        sfx = "arrowFail"
         processFailedInput(currentIndex);
     }
+    playSfx(sfx)
 }
 
-function processCorrectInput(currentIndex) {
+async function processCorrectInput(currentIndex) {
     board.children[currentIndex].classList.add("completed");
     if (currentInput.length === targetInput.length) {
-        setKeyListenerActive(false);
         shiftStratagem();
+    } else {
+        keyListenerActive = true
     }
 }
 
@@ -41,7 +55,7 @@ async function processFailedInput(currentIndex) {
         }
     }
 
-    setKeyListenerActive(false);
+    keyListenerActive = false;
     for (let i = 0; i < 4; i++) {
         setAllArrowStates(i % 2 === 0);
         await sleep(100);
@@ -56,15 +70,7 @@ function wipeInput() {
     [...board.children].forEach(item => {
         item.classList.remove("completed", "failed");
     });
-    setKeyListenerActive();
-}
-
-function setKeyListenerActive(active = true) {
-    if (active) {
-        addEventListener("keypress", handleKeyPress);
-    } else {
-        removeEventListener("keypress", handleKeyPress);
-    }
+    keyListenerActive = true
 }
 
 function setStratagemCode() {

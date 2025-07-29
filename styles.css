@@ -15,11 +15,11 @@ body {
     box-shadow: #000 0 0 3rem;
 
     width: 64rem;
-    height: 32rem;
+    height: 44rem;
     box-sizing: border-box;
 
     display: grid;
-    grid-template-rows: 1fr 8rem;
+    grid-template-rows: 8rem 1fr 8rem;
     padding: 2rem;
     gap: 2rem;
 }
@@ -34,6 +34,10 @@ body {
     padding: 2rem;
     gap: 1rem;
     overflow: hidden;
+}
+
+#nameplate {
+    justify-content: center;
 }
 
 img {

@@ -13,14 +13,16 @@ function addStratagem(name) {
 
 async function shiftStratagem() {
     await sleep(100);
-    currentStratagems.shift();
     const screenItem = screen.children[0];
     screenItem.classList.add("completed");
+    currentStratagems.shift();
+    playSfx("stratagemComplete");
     await sleep(250);
     screen.removeChild(screenItem);
     setStratagemCode();
-    setKeyListenerActive();
-
+    if (currentStratagems.length > 0) {
+        keyListenerActive = true;
+    }
 }
 
 function getCurrentStratagemCode() {
@@ -36,7 +38,7 @@ async function startStratagemHandler() {
             addStratagem(stratagems[index].name);
         }
         setStratagemCode();
-        setKeyListenerActive();
+        keyListenerActive = true;
         checkCompletion();
 
         function checkCompletion() {

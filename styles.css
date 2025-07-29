@@ -38,16 +38,16 @@ body {
 
 img {
     image-rendering: pixelated;
+    filter: drop-shadow(0 0 1rem #000);
+    opacity: 1;
+    transition: opacity .25s;
 }
 
-.correct, .incorrect {
-    outline: 4px solid;
+.completed {
+    opacity: 0;
 }
 
-.correct {
-    outline-color: lime;
-}
-
-.incorrect {
-    outline-color: red;
+.failed {
+    filter: brightness(50%) sepia(100%) hue-rotate(-45deg) contrast(200%);
+    opacity: 1;
 }

@@ -15,26 +15,38 @@ function addInput(key) {
     const currentIndex = currentInput.length;
     currentInput.push(key);
     if (currentInput[currentIndex] === targetInput[currentIndex]) {
-        // correct
-        board.children[currentIndex].classList.add("correct");
-        if (currentInput.length === targetInput.length) {
-            setKeyListenerActive(false);
-            setTimeout(() => {
-                shiftStratagem();
-                setStratagemCode();
-                setKeyListenerActive();
-            }, 200);
-        }
-
+        processCorrectInput(currentIndex);
     } else {
-        // incorrect
-        board.children[currentIndex].classList.add("incorrect");
-        setKeyListenerActive(false);
-        setTimeout(() => {
-            wipeInput();
-            setKeyListenerActive();
-        }, 200);
+        processFailedInput(currentIndex);
     }
+}
+
+function processCorrectInput(currentIndex) {
+    board.children[currentIndex].classList.add("completed");
+    if (currentInput.length === targetInput.length) {
+        setKeyListenerActive(false);
+        shiftStratagem();
+    }
+}
+
+async function processFailedInput(currentIndex) {
+    function setAllArrowStates(add = true) {
+        for (let i = 0; i <= currentIndex; i++) {
+            const cl = board.children[i].classList;
+            if (add) {
+                cl.add("failed");
+            } else {
+                cl.remove("failed", "completed");
+            }
+        }
+    }
+
+    setKeyListenerActive(false);
+    for (let i = 0; i < 4; i++) {
+        setAllArrowStates(i % 2 === 0);
+        await sleep(100);
+    }
+    wipeInput();
 }
 
 function wipeInput() {
@@ -42,8 +54,9 @@ function wipeInput() {
         currentInput.pop();
     }
     [...board.children].forEach(item => {
-        item.classList.remove("correct", "incorrect");
+        item.classList.remove("completed", "failed");
     });
+    setKeyListenerActive();
 }
 
 function setKeyListenerActive(active = true) {
@@ -54,19 +67,14 @@ function setKeyListenerActive(active = true) {
     }
 }
 
-function startInputHandler() {
-    setStratagemCode();
-    setKeyListenerActive();
-}
-
 function setStratagemCode() {
     const children = [...board.children];
-    children.forEach(child=>board.removeChild(child));
+    children.forEach(child => board.removeChild(child));
     targetInput = getCurrentStratagemCode();
     for (const key of targetInput) {
         const boardItem = document.createElement("img");
         boardItem.src = Sprites.arrows[key];
         board.appendChild(boardItem);
     }
-    wipeInput()
+    wipeInput();
 }

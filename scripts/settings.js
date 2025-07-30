@@ -14,10 +14,30 @@ const stratagems = [
     {name: "SSSD Delivery", img: "mission/disk", code: "sssww"},
     {name: "Super Earth Flag", img: "mission/flag", code: "swsw"},
     {name: "Tectonic Drill", img: "mission/drill", code: "wswsws"},
-    {name: "Upload Data", img: "mission/disk", code: "adwww"}
+    {name: "Upload Data", img: "mission/disk", code: "adwww"},
+    // Offensive
+    {name: "Eagle Airstrike", img: "offensive/eagle/airstrike", code: "wdsd"},
+    {name: "Eagle Cluster Bomb", img: "offensive/eagle/cluster", code: "wdssd"},
+    {name: "Eagle Napalm Airstrike", img: "offensive/eagle/napalm", code: "wdsw"},
+    {name: "Eagle Smoke Strike", img: "offensive/eagle/smoke", code: "wdws"},
+    {name: "Eagle Strafing Run", img: "offensive/eagle/strafing", code: "wdd"},
+    {name: "Eagle 110mm Rocket Pods", img: "offensive/eagle/110mm", code: "wdwa"},
+    {name: "Eagle 500kg Bomb", img: "offensive/eagle/500kg", code: "wdsss"},
+    {name: "Orbital Airburst Strike", img: "offensive/orbital/airburst", code: "ddd"},
+    {name: "Orbital EMS Strike", img: "offensive/orbital/ems", code: "ddas"},
+    {name: "Orbital Gas Strike", img: "offensive/orbital/gas", code: "ddsd"},
+    {name: "Orbital Gatling Barrage", img: "offensive/orbital/gatling", code: "dsaww"},
+    {name: "Orbital Laser", img: "offensive/orbital/laser", code: "dswds"},
+    {name: "Orbital Napalm Barrage", img: "offensive/orbital/napalm", code: "ddsadw"},
+    {name: "Orbital Precision Strike", img: "offensive/orbital/precision", code: "ddw"},
+    {name: "Orbital Railcannon Strike", img: "offensive/orbital/railcannon", code: "dwssd"},
+    {name: "Orbital Smoke Strike", img: "offensive/orbital/smoke", code: "ddsw"},
+    {name: "Orbital Walking Barrage", img: "offensive/orbital/walking", code: "dsdsds"},
+    {name: "Orbital 120mm HE Barrage", img: "offensive/orbital/120mm", code: "ddsads"},
+    {name: "Orbital 380mm HE Barrage", img: "offensive/orbital/380mm", code: "dswwass"}
 ];
 
-const sfxPrefix = "/assets/sfx/"
+const sfxPrefix = "/assets/sfx/";
 const Sfx = {
     arrowFail: sfxPrefix + "arrow fail.ogg",
     arrowComplete: sfxPrefix + "arrow complete.ogg",

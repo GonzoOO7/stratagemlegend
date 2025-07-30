@@ -19,16 +19,18 @@ async function shiftStratagem() {
     playSfx("stratagemComplete");
     await sleep(250);
     screen.removeChild(screenItem);
-    setStratagemCode();
+    setStratagem();
     if (currentStratagems.length > 0) {
         keyListenerActive = true;
     }
 }
 
-function getCurrentStratagemCode() {
-    const stratagem = currentStratagems[0];
-    const code = stratagem ? stratagem.code : "";
-    return code.split("");
+function getCurrentStratagem() {
+    const stratagem = {...currentStratagems[0]};
+    if (stratagem) {
+        stratagem.code = stratagem.code.split("");
+    }
+    return stratagem;
 }
 
 async function startStratagemHandler() {
@@ -37,7 +39,7 @@ async function startStratagemHandler() {
             const index = Math.floor(Math.random() * stratagems.length);
             addStratagem(stratagems[index].name);
         }
-        setStratagemCode();
+        setStratagem();
         keyListenerActive = true;
         checkCompletion();
 

@@ -2,6 +2,7 @@ let targetInput = [];
 const currentInput = [];
 let keyListenerActive = false;
 
+const nameplate = document.getElementById('nameplate')
 const board = document.getElementById("arrow-board");
 addEventListener("keypress", handleKeyPress);
 
@@ -73,10 +74,18 @@ function wipeInput() {
     keyListenerActive = true
 }
 
-function setStratagemCode() {
-    const children = [...board.children];
-    children.forEach(child => board.removeChild(child));
-    targetInput = getCurrentStratagemCode();
+function setStratagem() {
+    const stratagem = getCurrentStratagem();
+    // Name
+    const text = document.createElement('h3')
+    text.innerText = stratagem.name
+    const nameplateChildren = [...nameplate.children];
+    nameplateChildren.forEach(child => nameplate.removeChild(child));
+    nameplate.appendChild(text)
+    // Keys
+    const boardChildren = [...board.children];
+    boardChildren.forEach(child => board.removeChild(child));
+    targetInput = stratagem.code
     for (const key of targetInput) {
         const boardItem = document.createElement("img");
         boardItem.src = Sprites.arrows[key];

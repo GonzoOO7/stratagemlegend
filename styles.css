@@ -29,15 +29,20 @@ body {
     box-shadow: #000 inset 0 0 1rem;
 }
 
-#screen, #arrow-board {
+#screen, #arrow-board, #nameplate {
     display: flex;
     padding: 2rem;
-    gap: 1rem;
+    gap: 2rem;
     overflow: hidden;
 }
 
-#nameplate {
-    justify-content: center;
+#nameplate h3 {
+    font-size: 4rem;
+    font-family: Consolas, sans-serif;
+    color: white;
+    text-wrap: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 img {

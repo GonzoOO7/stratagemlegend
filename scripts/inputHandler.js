@@ -1,95 +1,76 @@
-let targetInput = [];
-const currentInput = [];
-let keyListenerActive = false;
+// Tree navigation: renders the breadcrumb and the current folder's contents,
+// and handles clicks on folder tiles (descend) and stratagem tiles (answer).
 
-const nameplate = document.getElementById('nameplate')
-const board = document.getElementById("arrow-board");
-addEventListener("keypress", handleKeyPress);
+const screen = document.getElementById("screen");
+const breadcrumb = document.getElementById("breadcrumb");
 
-function handleKeyPress(keyEvent) {
-    if (!keyListenerActive) {
-        return;
-    } else {
-        keyListenerActive = false;
-    }
+let currentPath = [];   // [] == root
+let locked = false;     // true while the correct answer animation plays
 
-    const key = keyEvent.key;
-    if (!["w", "a", "s", "d"].includes(key)) {
-        return;
-    }
+function renderBreadcrumb() {
+    breadcrumb.replaceChildren();
 
-    addInput(key);
-}
+    const rootCrumb = el("span", "crumb root", {textContent: "Stratagem Legend"});
+    rootCrumb.addEventListener("click", () => navigate([]));
+    breadcrumb.appendChild(rootCrumb);
 
-function addInput(key) {
-    const currentIndex = currentInput.length;
-    currentInput.push(key);
-    let sfx;
-    if (currentInput[currentIndex] === targetInput[currentIndex]) {
-        sfx = "arrowComplete"
-        processCorrectInput(currentIndex);
-    } else {
-        sfx = "arrowFail"
-        processFailedInput(currentIndex);
-    }
-    playSfx(sfx)
-}
-
-async function processCorrectInput(currentIndex) {
-    board.children[currentIndex].classList.add("completed");
-    if (currentInput.length === targetInput.length) {
-        shiftStratagem();
-    } else {
-        keyListenerActive = true
+    let acc = [];
+    for (const name of currentPath) {
+        acc = [...acc, name];
+        const target = [...acc];
+        const sep = el("span", "sep", {textContent: "›"});
+        const crumb = el("span", "crumb", {textContent: name});
+        crumb.addEventListener("click", () => navigate(target));
+        breadcrumb.append(sep, crumb);
     }
 }
 
-async function processFailedInput(currentIndex) {
-    function setAllArrowStates(add = true) {
-        for (let i = 0; i <= currentIndex; i++) {
-            const cl = board.children[i].classList;
-            if (add) {
-                cl.add("failed");
-            } else {
-                cl.remove("failed", "completed");
-            }
-        }
+function renderScreen() {
+    const node = nodeChildren(currentPath);
+    screen.replaceChildren();
+
+    const subcategories = nodeSubcategories(node);
+    const stratagemIds = nodeStratagems(node);
+
+    for (const sub of subcategories) {
+        const childPath = [...currentPath, sub.name];
+        const icon = categoryIconPath(childPath);
+        const tile = el("div", "tile folder", {title: sub.name}, [
+            el("img", "", {src: Paths.categories + icon, alt: ""}),
+            el("span", "label", {textContent: sub.name})
+        ]);
+        tile.addEventListener("click", () => {
+            if (!locked) navigate(childPath);
+        });
+        screen.appendChild(tile);
     }
 
-    keyListenerActive = false;
-    for (let i = 0; i < 4; i++) {
-        setAllArrowStates(i % 2 === 0);
-        await sleep(100);
+    // Only worth drawing when the view actually holds both kinds.
+    if (subcategories.length && stratagemIds.length) {
+        screen.appendChild(el("div", "separator"));
     }
-    wipeInput();
+
+    for (const id of stratagemIds) {
+        const stratagem = Data.byId[id];
+        const label = (stratagem.prefix ? stratagem.prefix + " " : "") + stratagem.name;
+        const tile = el("div", "tile stratagem", {title: stratagem.name}, [
+            el("img", "", {src: stratagemIcon(id), alt: ""}),
+            el("span", "label", {textContent: label})
+        ]);
+        tile.addEventListener("click", () => {
+            if (!locked) answer(id, tile);
+        });
+        screen.appendChild(tile);
+    }
 }
 
-function wipeInput() {
-    while (currentInput.length > 0) {
-        currentInput.pop();
-    }
-    [...board.children].forEach(item => {
-        item.classList.remove("completed", "failed");
-    });
-    keyListenerActive = true
+function navigate(path) {
+    currentPath = path;
+    renderBreadcrumb();
+    renderScreen();
 }
 
-function setStratagem() {
-    const stratagem = getCurrentStratagem();
-    // Name
-    const text = document.createElement('h3')
-    text.innerText = stratagem.name
-    const nameplateChildren = [...nameplate.children];
-    nameplateChildren.forEach(child => nameplate.removeChild(child));
-    nameplate.appendChild(text)
-    // Keys
-    const boardChildren = [...board.children];
-    boardChildren.forEach(child => board.removeChild(child));
-    targetInput = stratagem.code
-    for (const key of targetInput) {
-        const boardItem = document.createElement("img");
-        boardItem.src = Sprites.arrows[key];
-        board.appendChild(boardItem);
-    }
-    wipeInput();
+function flash(tile, className, ms) {
+    tile.classList.add(className);
+    setTimeout(() => tile.classList.remove(className), ms);
 }

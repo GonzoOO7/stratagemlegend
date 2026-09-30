@@ -1,0 +1,9 @@
+# scratch dir for screenshots, extracted data and one-off scripts
+tmp/
+
+# superseded by assets/icons/stratagems + assets/icons/categories
+assets/stratagem/
+
+# stray empty files, never had content
+/npm
+/opencode

@@ -1,0 +1,27 @@
+* {
+    margin: 0;
+}
+
+@font-face {
+    font-family: HD;
+    src: url("/assets/font/RobotoSlab.ttf");
+    font-display: swap;
+}
+
+body {
+    min-height: 100vh;
+    background-color: #222;
+    display: grid;
+    justify-items: center;
+    align-content: center;
+    padding: 2rem;
+    box-sizing: border-box;
+}
+
+img {
+    image-rendering: pixelated;
+}
+
+button {
+    font: inherit;
+}

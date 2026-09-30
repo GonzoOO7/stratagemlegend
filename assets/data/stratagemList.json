@@ -1,0 +1,698 @@
+[
+  {
+    "id": "orbital_precision_strike",
+    "prefix": null,
+    "name": "Orbital Precision Strike",
+    "code": "ddw"
+  },
+  {
+    "id": "orbital_gatling_barrage",
+    "prefix": null,
+    "name": "Orbital Gatling Barrage",
+    "code": "dsaww"
+  },
+  {
+    "id": "orbital_gas_strike",
+    "prefix": null,
+    "name": "Orbital Gas Strike",
+    "code": "ddsd"
+  },
+  {
+    "id": "orbital_120mm_he_barrage",
+    "prefix": null,
+    "name": "Orbital 120mm HE Barrage",
+    "code": "ddsads"
+  },
+  {
+    "id": "orbital_airburst_strike",
+    "prefix": null,
+    "name": "Orbital Airburst Strike",
+    "code": "ddd"
+  },
+  {
+    "id": "orbital_smoke_strike",
+    "prefix": null,
+    "name": "Orbital Smoke Strike",
+    "code": "ddsw"
+  },
+  {
+    "id": "orbital_ems_strike",
+    "prefix": null,
+    "name": "Orbital EMS Strike",
+    "code": "ddas"
+  },
+  {
+    "id": "orbital_380mm_he_barrage",
+    "prefix": null,
+    "name": "Orbital 380mm HE Barrage",
+    "code": "dswwass"
+  },
+  {
+    "id": "orbital_walking_barrage",
+    "prefix": null,
+    "name": "Orbital Walking Barrage",
+    "code": "dsdsds"
+  },
+  {
+    "id": "orbital_laser",
+    "prefix": null,
+    "name": "Orbital Laser",
+    "code": "dswds"
+  },
+  {
+    "id": "orbital_napalm_barrage",
+    "prefix": null,
+    "name": "Orbital Napalm Barrage",
+    "code": "ddsadw"
+  },
+  {
+    "id": "orbital_railcannon_strike",
+    "prefix": null,
+    "name": "Orbital Railcannon Strike",
+    "code": "dwssd"
+  },
+  {
+    "id": "eagle_gas_airstrike",
+    "prefix": null,
+    "name": "Eagle Gas Airstrike",
+    "code": "wdad"
+  },
+  {
+    "id": "eagle_strafing_run",
+    "prefix": null,
+    "name": "Eagle Strafing Run",
+    "code": "wdd"
+  },
+  {
+    "id": "eagle_airstrike",
+    "prefix": null,
+    "name": "Eagle Airstrike",
+    "code": "wdsd"
+  },
+  {
+    "id": "eagle_cluster_bomb",
+    "prefix": null,
+    "name": "Eagle Cluster Bomb",
+    "code": "wdssd"
+  },
+  {
+    "id": "eagle_smoke_strike",
+    "prefix": null,
+    "name": "Eagle Smoke Strike",
+    "code": "wdws"
+  },
+  {
+    "id": "eagle_napalm_airstrike",
+    "prefix": null,
+    "name": "Eagle Napalm Airstrike",
+    "code": "wdsw"
+  },
+  {
+    "id": "eagle_110mm_rocket_pods",
+    "prefix": null,
+    "name": "Eagle 110mm Rocket Pods",
+    "code": "wdwa"
+  },
+  {
+    "id": "eagle_500kg_bomb",
+    "prefix": null,
+    "name": "Eagle 500kg Bomb",
+    "code": "wdsss"
+  },
+  {
+    "id": "machine_gun",
+    "prefix": "MG-43",
+    "name": "Machine Gun",
+    "code": "saswd"
+  },
+  {
+    "id": "expendable_anti_tank",
+    "prefix": "EAT-17",
+    "name": "Expendable Anti-Tank",
+    "code": "ssawd"
+  },
+  {
+    "id": "stalwart",
+    "prefix": "M-105",
+    "name": "Stalwart",
+    "code": "saswwa"
+  },
+  {
+    "id": "laser_cannon",
+    "prefix": "LAS-98",
+    "name": "Laser Cannon",
+    "code": "saswa"
+  },
+  {
+    "id": "anti_materiel_rifle",
+    "prefix": "APW-1",
+    "name": "Anti-Materiel Rifle",
+    "code": "sadws"
+  },
+  {
+    "id": "recoilless_rifle",
+    "prefix": "GR-8",
+    "name": "Recoilless Rifle",
+    "code": "sadda"
+  },
+  {
+    "id": "grenade_launcher",
+    "prefix": "GL-21",
+    "name": "Grenade Launcher",
+    "code": "sawas"
+  },
+  {
+    "id": "flamethrower",
+    "prefix": "FLAM-40",
+    "name": "Flamethrower",
+    "code": "sawsw"
+  },
+  {
+    "id": "heavy_machine_gun",
+    "prefix": "MG-206",
+    "name": "Heavy Machine Gun",
+    "code": "sawss"
+  },
+  {
+    "id": "autocannon",
+    "prefix": "AC-8",
+    "name": "Autocannon",
+    "code": "saswwd"
+  },
+  {
+    "id": "arc_thrower",
+    "prefix": "ARC-3",
+    "name": "Arc Thrower",
+    "code": "sdswaa"
+  },
+  {
+    "id": "quasar_cannon",
+    "prefix": "LAS-99",
+    "name": "Quasar Cannon",
+    "code": "sswad"
+  },
+  {
+    "id": "airburst_rocket_launcher",
+    "prefix": "RL-77",
+    "name": "Airburst Rocket Launcher",
+    "code": "swwad"
+  },
+  {
+    "id": "commando",
+    "prefix": "MLS-4X",
+    "name": "Commando",
+    "code": "sawsd"
+  },
+  {
+    "id": "spear",
+    "prefix": "FAF-14",
+    "name": "Spear",
+    "code": "sswss"
+  },
+  {
+    "id": "railgun",
+    "prefix": "RS-422",
+    "name": "Railgun",
+    "code": "sdswad"
+  },
+  {
+    "id": "wasp_launcher",
+    "prefix": "StA-X3",
+    "name": "W.A.S.P. Launcher",
+    "code": "sswsd"
+  },
+  {
+    "id": "breaching_hammer",
+    "prefix": "CQC-20",
+    "name": "Breaching Hammer",
+    "code": "sadaw"
+  },
+  {
+    "id": "epoch",
+    "prefix": "PLAS-45",
+    "name": "Epoch",
+    "code": "sawad"
+  },
+  {
+    "id": "bullet_storm",
+    "prefix": "MGX-42",
+    "name": "Bullet Storm",
+    "code": "sasdwa"
+  },
+  {
+    "id": "speargun",
+    "prefix": "S-11",
+    "name": "Speargun",
+    "code": "sdsawd"
+  },
+  {
+    "id": "defoliation_tool",
+    "prefix": "CQC-9",
+    "name": "Defoliation Tool",
+    "code": "sadds"
+  },
+  {
+    "id": "de_escalator",
+    "prefix": "GL-52",
+    "name": "De-Escalator",
+    "code": "sdwad"
+  },
+  {
+    "id": "expendable_napalm",
+    "prefix": "EAT-700",
+    "name": "Expendable Napalm",
+    "code": "ssawa"
+  },
+  {
+    "id": "sterilizer",
+    "prefix": "TX-41",
+    "name": "Sterilizer",
+    "code": "sawsa"
+  },
+  {
+    "id": "leveller",
+    "prefix": "EAT-411",
+    "name": "Leveller",
+    "code": "ssaws"
+  },
+  {
+    "id": "belt_fed_grenade_launcher",
+    "prefix": "GL-28",
+    "name": "Belt-Fed Grenade Launcher",
+    "code": "sawaww"
+  },
+  {
+    "id": "c4_pack",
+    "prefix": "B/MD",
+    "name": "C4 Pack",
+    "code": "sdwwdw"
+  },
+  {
+    "id": "solo_silo",
+    "prefix": "MS-11",
+    "name": "Solo Silo",
+    "code": "swdss"
+  },
+  {
+    "id": "cremator",
+    "prefix": "B/FLAM-80",
+    "name": "Cremator",
+    "code": "ssdsww"
+  },
+  {
+    "id": "maxigun",
+    "prefix": "M-1000",
+    "name": "Maxigun",
+    "code": "sadsww"
+  },
+  {
+    "id": "one_true_flag",
+    "prefix": "CQC-1",
+    "name": "One True Flag",
+    "code": "saddw"
+  },
+  {
+    "id": "meltagun",
+    "prefix": "40-K",
+    "name": "Meltagun",
+    "code": "sawaas"
+  },
+  {
+    "id": "supply_pack",
+    "prefix": "B-1",
+    "name": "Supply Pack",
+    "code": "saswws"
+  },
+  {
+    "id": "jump_pack",
+    "prefix": "LIFT-850",
+    "name": "Jump Pack",
+    "code": "swwsw"
+  },
+  {
+    "id": "ballistic_shield_backpack",
+    "prefix": "SH-20",
+    "name": "Ballistic Shield Backpack",
+    "code": "sasswa"
+  },
+  {
+    "id": "guard_dog",
+    "prefix": "AX/AR-23",
+    "name": "Guard Dog",
+    "code": "swawds"
+  },
+  {
+    "id": "rover",
+    "prefix": "AX/LAS-5",
+    "name": "Rover",
+    "code": "swawdd"
+  },
+  {
+    "id": "shield_generator_pack",
+    "prefix": "SH-32",
+    "name": "Shield Generator Pack",
+    "code": "swadad"
+  },
+  {
+    "id": "directional_shield",
+    "prefix": "SH-51",
+    "name": "Directional Shield",
+    "code": "swadww"
+  },
+  {
+    "id": "hot_dog",
+    "prefix": "AX/FLAM-75",
+    "name": "Hot Dog",
+    "code": "swawaa"
+  },
+  {
+    "id": "portable_hellbomb",
+    "prefix": "B-100",
+    "name": "Portable Hellbomb",
+    "code": "sdwww"
+  },
+  {
+    "id": "portable_hellbomb_mission",
+    "prefix": "B-100",
+    "name": "Portable Hellbomb",
+    "code": "sdwws"
+  },
+  {
+    "id": "k_9",
+    "prefix": "AX/ARC-3",
+    "name": "K-9",
+    "code": "swawda"
+  },
+  {
+    "id": "hover_pack",
+    "prefix": "LIFT-860",
+    "name": "Hover Pack",
+    "code": "swwsad"
+  },
+  {
+    "id": "dog_breath",
+    "prefix": "AX/TX-13",
+    "name": "Dog Breath",
+    "code": "swawdw"
+  },
+  {
+    "id": "warp_pack",
+    "prefix": "LIFT-182",
+    "name": "Warp Pack",
+    "code": "sadsad"
+  },
+  {
+    "id": "supply_frv",
+    "prefix": "M-103",
+    "name": "Supply FRV",
+    "code": "asaaswd"
+  },
+  {
+    "id": "maelstrom",
+    "prefix": "TD-110",
+    "name": "Maelstrom",
+    "code": "asdsaswad"
+  },
+  {
+    "id": "incinerator_frv",
+    "prefix": "M-104",
+    "name": "Incinerator FRV",
+    "code": "asdasww"
+  },
+  {
+    "id": "emancipator_exosuit",
+    "prefix": "EXO-49",
+    "name": "Emancipator Exosuit",
+    "code": "asdwasw"
+  },
+  {
+    "id": "patriot_exosuit",
+    "prefix": "EXO-45",
+    "name": "Patriot Exosuit",
+    "code": "asdwass"
+  },
+  {
+    "id": "gunner_frv",
+    "prefix": "M-102",
+    "name": "Gunner FRV",
+    "code": "asdsdsw"
+  },
+  {
+    "id": "bastion_mk_xvi",
+    "prefix": "TD-220",
+    "name": "Bastion MK XVI",
+    "code": "asdsaswsw"
+  },
+  {
+    "id": "breakthrough_exosuit",
+    "prefix": "EXO-55",
+    "name": "Breakthrough Exosuit",
+    "code": "asdadsw"
+  },
+  {
+    "id": "lumberer_exosuit",
+    "prefix": "EXO-51",
+    "name": "Lumberer Exosuit",
+    "code": "asdwdaw"
+  },
+  {
+    "id": "machine_gun_sentry",
+    "prefix": "A/MG-43",
+    "name": "Machine Gun Sentry",
+    "code": "swddw"
+  },
+  {
+    "id": "gatling_sentry",
+    "prefix": "A/G-16",
+    "name": "Gatling Sentry",
+    "code": "swda"
+  },
+  {
+    "id": "autocannon_sentry",
+    "prefix": "A/AC-8",
+    "name": "Autocannon Sentry",
+    "code": "swdwaw"
+  },
+  {
+    "id": "mortar_sentry",
+    "prefix": "A/M-12",
+    "name": "Mortar Sentry",
+    "code": "swdds"
+  },
+  {
+    "id": "rocket_sentry",
+    "prefix": "A/MLS-4X",
+    "name": "Rocket Sentry",
+    "code": "swdda"
+  },
+  {
+    "id": "tesla_tower",
+    "prefix": "A/ARC-3",
+    "name": "Tesla Tower",
+    "code": "swdwad"
+  },
+  {
+    "id": "ems_mortar_sentry",
+    "prefix": "A/M-23",
+    "name": "EMS Mortar Sentry",
+    "code": "swdsd"
+  },
+  {
+    "id": "laser_sentry",
+    "prefix": "A/LAS-98",
+    "name": "Laser Sentry",
+    "code": "swdswd"
+  },
+  {
+    "id": "flame_sentry",
+    "prefix": "A/FLAM-40",
+    "name": "Flame Sentry",
+    "code": "swdsww"
+  },
+  {
+    "id": "gas_mortar_sentry",
+    "prefix": "A/GM-17",
+    "name": "Gas Mortar Sentry",
+    "code": "swdsa"
+  },
+  {
+    "id": "anti_personnel_minefield",
+    "prefix": "MD-6",
+    "name": "Anti-Personnel Minefield",
+    "code": "sawd"
+  },
+  {
+    "id": "incendiary_mines",
+    "prefix": "MD-I4",
+    "name": "Incendiary Mines",
+    "code": "saas"
+  },
+  {
+    "id": "anti_tank_mines",
+    "prefix": "MD-17",
+    "name": "Anti-Tank Mines",
+    "code": "saww"
+  },
+  {
+    "id": "shield_generator_relay",
+    "prefix": "FX-12",
+    "name": "Shield Generator Relay",
+    "code": "ssadad"
+  },
+  {
+    "id": "hmg_emplacement",
+    "prefix": "E/MG-101",
+    "name": "HMG Emplacement",
+    "code": "swadda"
+  },
+  {
+    "id": "grenadier_battlement",
+    "prefix": "E/GL-21",
+    "name": "Grenadier Battlement",
+    "code": "sdsad"
+  },
+  {
+    "id": "gas_mines",
+    "prefix": "MD-8",
+    "name": "Gas Mines",
+    "code": "saad"
+  },
+  {
+    "id": "anti_tank_emplacement",
+    "prefix": "E/AT-12",
+    "name": "Anti-Tank Emplacement",
+    "code": "swaddd"
+  },
+  {
+    "id": "eagle_rearm",
+    "prefix": null,
+    "name": "Eagle Rearm",
+    "code": "wwawd"
+  },
+  {
+    "id": "call_in_super_destroyer",
+    "prefix": null,
+    "name": "Call In Super Destroyer",
+    "code": "wwssadad"
+  },
+  {
+    "id": "sos_beacon",
+    "prefix": null,
+    "name": "SoS Beacon",
+    "code": "wsdw"
+  },
+  {
+    "id": "resupply",
+    "prefix": null,
+    "name": "Resupply",
+    "code": "sswd"
+  },
+  {
+    "id": "reinforce",
+    "prefix": null,
+    "name": "Reinforce",
+    "code": "wsdaw"
+  },
+  {
+    "id": "dark_fluid_vessel",
+    "prefix": null,
+    "name": "Dark Fluid Vessel",
+    "code": "wadsww"
+  },
+  {
+    "id": "seaf_artillery",
+    "prefix": null,
+    "name": "SEAF Artillery",
+    "code": "dwws"
+  },
+  {
+    "id": "portable_comms_relay",
+    "prefix": null,
+    "name": "Portable Comms Relay",
+    "code": "wwssaas"
+  },
+  {
+    "id": "tactical_video_camera",
+    "prefix": null,
+    "name": "Tactical Video Camera",
+    "code": "dsswaaw"
+  },
+  {
+    "id": "upload_data",
+    "prefix": null,
+    "name": "Upload Data",
+    "code": "adwww"
+  },
+  {
+    "id": "seismic_probe",
+    "prefix": null,
+    "name": "Seismic Probe",
+    "code": "wwadss"
+  },
+  {
+    "id": "super_earth_flag",
+    "prefix": null,
+    "name": "Super Earth Flag",
+    "code": "swsw"
+  },
+  {
+    "id": "sssd_delivery_short",
+    "prefix": null,
+    "name": "SSSD Delivery",
+    "code": "sssww"
+  },
+  {
+    "id": "sssd_delivery_long",
+    "prefix": null,
+    "name": "SSSD Delivery",
+    "code": "sssssww"
+  },
+  {
+    "id": "cargo_container",
+    "prefix": null,
+    "name": "Cargo Container",
+    "code": "wwssds"
+  },
+  {
+    "id": "activate_e_711_extraction_drill",
+    "prefix": null,
+    "name": "Activate E-711 Extraction Drill",
+    "code": "ssaass"
+  },
+  {
+    "id": "hive_breaker_drill",
+    "prefix": null,
+    "name": "Hive Breaker Drill",
+    "code": "awsdss"
+  },
+  {
+    "id": "prospecting_drill",
+    "prefix": null,
+    "name": "Prospecting Drill",
+    "code": "ssadss"
+  },
+  {
+    "id": "aquifer_drill",
+    "prefix": null,
+    "name": "Aquifer Drill",
+    "code": "aaawsdss"
+  },
+  {
+    "id": "tectonic_drill",
+    "prefix": null,
+    "name": "Tectonic Drill",
+    "code": "wswsws"
+  },
+  {
+    "id": "hellbomb",
+    "prefix": "NUX-223",
+    "name": "Hellbomb",
+    "code": "swaswdsw"
+  },
+  {
+    "id": "orbital_illumination_flare",
+    "prefix": null,
+    "name": "Orbital Illumination Flare",
+    "code": "ddaa"
+  }
+]

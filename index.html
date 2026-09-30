@@ -2,18 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>GonzoGem Hero</title>
-    <link href="styles.css" rel="stylesheet">
+    <title>Stratagem Legend</title>
+    <link href="styles/global.css" rel="stylesheet">
+    <link href="styles/arcade.css" rel="stylesheet">
 </head>
 <body id="page">
 <div id="arcade">
-    <div id="nameplate"></div>
+    <div id="prompt">
+        <div id="code"></div>
+        <div id="hud">
+            <span id="misses-label">misses</span>
+            <span id="misses">0</span>
+            <span id="streak-label">streak</span>
+            <span id="streak">0</span>
+        </div>
+    </div>
+    <nav id="breadcrumb"></nav>
     <div id="screen"></div>
-    <div id="arrow-board"></div>
 </div>
 </body>
 <script src="scripts/settings.js"></script>
 <script src="scripts/util.js"></script>
+<script src="scripts/data.js"></script>
 <script src="scripts/stratagemHandler.js"></script>
 <script src="scripts/inputHandler.js"></script>
 <script src="scripts/load.js"></script>

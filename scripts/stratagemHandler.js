@@ -1,54 +1,78 @@
-const currentStratagems = [];
-const screen = document.getElementById("screen");
+// One stratagem at a time, endless: show its code, let the player navigate the
+// tree to find it, flash the tile, then deal the next one.
 
-function addStratagem(name) {
-    const stratagem = stratagems.find(elem => elem.name === name);
-    currentStratagems.push(stratagem);
+const codeBoard = document.getElementById("code");
+const streakEl = document.getElementById("streak");
+const missesEl = document.getElementById("misses");
 
-    const screenItem = document.createElement("img");
-    screenItem.src = `/assets/stratagem/${stratagem.img}.png`;
-    screenItem.alt = stratagem.name;
-    screen.appendChild(screenItem);
-}
+let target = null;
+let streak = 0;
+let accepting = false;
+let misses = 0;
 
-async function shiftStratagem() {
-    await sleep(100);
-    const screenItem = screen.children[0];
-    screenItem.classList.add("completed");
-    currentStratagems.shift();
-    playSfx("stratagemComplete");
-    await sleep(250);
-    screen.removeChild(screenItem);
-    setStratagem();
-    if (currentStratagems.length > 0) {
-        keyListenerActive = true;
+function renderCode(stratagem) {
+    codeBoard.replaceChildren();
+    for (const key of stratagem.code) {
+        codeBoard.appendChild(el("img", "", {src: Sprites.arrows[key], alt: key}));
     }
 }
 
-function getCurrentStratagem() {
-    const stratagem = {...currentStratagems[0]};
-    if (stratagem) {
-        stratagem.code = stratagem.code.split("");
-    }
-    return stratagem;
+function setStreak() {
+    streakEl.textContent = streak;
 }
 
-async function startStratagemHandler() {
-    return new Promise(resolve => {
-        for (let i = 0; i < 10; i++) {
-            const index = Math.floor(Math.random() * stratagems.length);
-            addStratagem(stratagems[index].name);
-        }
-        setStratagem();
-        keyListenerActive = true;
-        checkCompletion();
+function setMisses() {
+    missesEl.textContent = misses;
+}
 
-        function checkCompletion() {
-            if (currentStratagems.length === 0) {
-                resolve();
-            } else {
-                setTimeout(checkCompletion, 100);
-            }
-        }
-    });
+async function nextStratagem() {
+    locked = true;
+    accepting = false;
+    misses = 0;
+    setMisses();
+    target = randomItem(Data.stratagems);
+    renderCode(target);
+    navigate([]);
+    locked = false;
+    accepting = true;
+}
+
+// A wrong click rewinds to the deepest point where the player's branch was still
+// correct - the longest common prefix of where they are and where the answer is.
+// Being on the right branch already means no movement.
+function registerMiss() {
+    misses++;
+    setMisses();
+
+    const path = Data.pathOf[target.id] || [];
+    const shared = [];
+    for (let i = 0; i < Math.min(currentPath.length, path.length); i++) {
+        if (currentPath[i] !== path[i]) break;
+        shared.push(currentPath[i]);
+    }
+
+    if (shared.length !== currentPath.length) navigate(shared);
+}
+
+async function answer(id, tile) {
+    if (!accepting) return;
+
+    if (id !== target.id) {
+        flash(tile, "failed", 400);
+        playSfx("wrong");
+        streak = 0;
+        setStreak();
+        registerMiss();
+        return;
+    }
+
+    accepting = false;
+    locked = true;
+    flash(tile, "correct", 500);
+    playSfx("correct");
+    streak++;
+    setStreak();
+
+    await sleep(600);
+    await nextStratagem();
 }

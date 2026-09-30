@@ -1,0 +1,10 @@
+{
+  "name": "stratagemlegend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Helldivers 2 stratagem code trainer",
+  "scripts": {
+    "start": "python3 -m http.server 8080",
+    "serve": "python3 -m http.server 8080"
+  }
+}

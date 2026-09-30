@@ -1,0 +1,342 @@
+[
+  {
+    "id": "offensive",
+    "name": "Offensive",
+    "subcategories": [
+      {
+        "id": "orbital",
+        "name": "Orbital",
+        "stratagemIds": [
+          "orbital_precision_strike",
+          "orbital_gatling_barrage",
+          "orbital_airburst_strike",
+          "orbital_napalm_barrage",
+          "orbital_120mm_he_barrage",
+          "orbital_walking_barrage",
+          "orbital_380mm_he_barrage",
+          "orbital_railcannon_strike",
+          "orbital_laser",
+          "orbital_ems_strike",
+          "orbital_gas_strike",
+          "orbital_smoke_strike"
+        ]
+      },
+      {
+        "id": "eagle",
+        "name": "Eagle",
+        "stratagemIds": [
+          "eagle_rearm",
+          "eagle_500kg_bomb",
+          "eagle_strafing_run",
+          "eagle_110mm_rocket_pods",
+          "eagle_airstrike",
+          "eagle_cluster_bomb",
+          "eagle_gas_airstrike",
+          "eagle_napalm_airstrike",
+          "eagle_smoke_strike"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "support",
+    "name": "Support",
+    "subcategories": [
+      {
+        "id": "equipment",
+        "name": "Equipment",
+        "subcategories": [
+          {
+            "id": "weapon",
+            "name": "Weapon",
+            "subcategories": [
+              {
+                "id": "melee",
+                "name": "Melee",
+                "stratagemIds": [
+                  "defoliation_tool",
+                  "breaching_hammer",
+                  "one_true_flag"
+                ]
+              },
+              {
+                "id": "expendable",
+                "name": "Expendable",
+                "stratagemIds": [
+                  "commando",
+                  "leveller",
+                  "expendable_napalm",
+                  "solo_silo",
+                  "bullet_storm",
+                  "expendable_anti_tank"
+                ]
+              },
+              {
+                "id": "handheld",
+                "name": "Handheld",
+                "stratagemIds": [
+                  "stalwart",
+                  "machine_gun",
+                  "heavy_machine_gun",
+                  "railgun",
+                  "speargun",
+                  "anti_materiel_rifle",
+                  "epoch",
+                  "grenade_launcher",
+                  "de_escalator",
+                  "sterilizer",
+                  "flamethrower",
+                  "laser_cannon",
+                  "quasar_cannon",
+                  "arc_thrower",
+                  "meltagun"
+                ]
+              },
+              {
+                "id": "backpack_gun",
+                "name": "Backpack",
+                "subcategories": [
+                  {
+                    "id": "team_reload",
+                    "name": "Team reload",
+                    "stratagemIds": [
+                      "c4_pack",
+                      "autocannon",
+                      "airburst_rocket_launcher",
+                      "spear",
+                      "wasp_launcher",
+                      "recoilless_rifle"
+                    ]
+                  },
+                  {
+                    "id": "belt_fed",
+                    "name": "belt fed",
+                    "stratagemIds": [
+                      "maxigun",
+                      "belt_fed_grenade_launcher",
+                      "cremator"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "backpack",
+            "name": "Backpack",
+            "stratagemIds": [
+              "c4_pack",
+              "supply_pack",
+              "portable_hellbomb"
+            ],
+            "subcategories": [
+              {
+                "id": "movement",
+                "name": "Movement",
+                "stratagemIds": [
+                  "warp_pack",
+                  "hover_pack",
+                  "jump_pack"
+                ]
+              },
+              {
+                "id": "shield",
+                "name": "Shield",
+                "stratagemIds": [
+                  "shield_generator_pack",
+                  "directional_shield",
+                  "ballistic_shield_backpack"
+                ]
+              },
+              {
+                "id": "dog",
+                "name": "Dog",
+                "stratagemIds": [
+                  "k_9",
+                  "hot_dog",
+                  "guard_dog",
+                  "rover",
+                  "dog_breath"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "vehicle",
+        "name": "Vehicle",
+        "subcategories": [
+          {
+            "id": "tank",
+            "name": "Tank",
+            "stratagemIds": [
+              "bastion_mk_xvi",
+              "maelstrom"
+            ]
+          },
+          {
+            "id": "frv",
+            "name": "FRV",
+            "stratagemIds": [
+              "supply_frv",
+              "gunner_frv",
+              "incinerator_frv"
+            ]
+          },
+          {
+            "id": "exosuit",
+            "name": "Exosuit",
+            "stratagemIds": [
+              "emancipator_exosuit",
+              "patriot_exosuit",
+              "breakthrough_exosuit",
+              "lumberer_exosuit"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "defensive",
+    "name": "Defensive",
+    "subcategories": [
+      {
+        "id": "sentry",
+        "name": "Sentry",
+        "subcategories": [
+          {
+            "id": "direct",
+            "name": "Direct",
+            "stratagemIds": [
+              "gatling_sentry",
+              "machine_gun_sentry",
+              "flame_sentry",
+              "laser_sentry",
+              "rocket_sentry",
+              "autocannon_sentry",
+              "tesla_tower"
+            ]
+          },
+          {
+            "id": "mortar",
+            "name": "Mortar",
+            "stratagemIds": [
+              "ems_mortar_sentry",
+              "gas_mortar_sentry",
+              "mortar_sentry"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "emplacement",
+        "name": "Emplacement",
+        "subcategories": [
+          {
+            "id": "shield",
+            "name": "Shield",
+            "stratagemIds": [
+              "shield_generator_relay",
+              "grenadier_battlement"
+            ]
+          },
+          {
+            "id": "mountable",
+            "name": "Mountable",
+            "stratagemIds": [
+              "anti_tank_emplacement",
+              "hmg_emplacement",
+              "grenadier_battlement"
+            ]
+          },
+          {
+            "id": "mines",
+            "name": "Mines",
+            "stratagemIds": [
+              "anti_tank_mines",
+              "gas_mines",
+              "anti_personnel_minefield",
+              "incendiary_mines"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "mission",
+    "name": "Mission",
+    "subcategories": [
+      {
+        "id": "ship",
+        "name": "Ship",
+        "stratagemIds": [
+          "reinforce",
+          "sos_beacon",
+          "resupply",
+          "eagle_rearm",
+          "call_in_super_destroyer"
+        ]
+      },
+      {
+        "id": "objective",
+        "name": "Objective",
+        "stratagemIds": [
+          "hellbomb",
+          "super_earth_flag",
+          "seaf_artillery",
+          "orbital_illumination_flare"
+        ],
+        "subcategories": [
+          {
+            "id": "containers",
+            "name": "Containers",
+            "stratagemIds": [
+              "portable_comms_relay",
+              "cargo_container"
+            ]
+          },
+          {
+            "id": "sssd",
+            "name": "SSSD",
+            "stratagemIds": [
+              "upload_data",
+              "sssd_delivery_short",
+              "sssd_delivery_long"
+            ]
+          },
+          {
+            "id": "equipment",
+            "name": "Equipment",
+            "stratagemIds": [
+              "tactical_video_camera",
+              "dark_fluid_vessel",
+              "portable_hellbomb_mission"
+            ]
+          },
+          {
+            "id": "prospecting",
+            "name": "Prospecting",
+            "stratagemIds": [
+              "prospecting_drill",
+              "seismic_probe"
+            ]
+          },
+          {
+            "id": "drill",
+            "name": "Drill",
+            "stratagemIds": [
+              "activate_e_711_extraction_drill",
+              "tectonic_drill",
+              "aquifer_drill",
+              "hive_breaker_drill",
+              "prospecting_drill"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -8,16 +8,16 @@ const Sfx = {
 };
 
 const Paths = {
-    arrows: "/assets/icons/keys/",
+    ui: "/assets/icons/ui/",
     stratagems: "/assets/icons/stratagems/",
     categories: "/assets/icons/categories/"
 };
 
 const Sprites = {
     arrows: {
-        w: Paths.arrows + "w.png",
-        a: Paths.arrows + "a.png",
-        s: Paths.arrows + "s.png",
-        d: Paths.arrows + "d.png"
+        w: Paths.ui + "w.png",
+        a: Paths.ui + "a.png",
+        s: Paths.ui + "s.png",
+        d: Paths.ui + "d.png"
     }
 };

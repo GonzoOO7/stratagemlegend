@@ -129,12 +129,30 @@
     width: 57px; /* 19px art, 3x */
     height: 57px;
     filter: drop-shadow(0 0 .5rem #000);
+    border-radius: .2rem;   /* every outline is rounded, not just folders */
 }
 
 .tile.folder img {
     outline: 1px dashed #3a4a6b;
     outline-offset: .35rem;
     border-radius: .2rem;
+}
+
+.tile.nav img {
+    outline: 1px solid #3a4a6b;
+    outline-offset: .35rem;
+    border-radius: .2rem;
+    opacity: .55;
+}
+
+.tile.nav:hover img {
+    opacity: 1;
+}
+
+/* Keyboard selection: BACK's outline form, in gold, at 2px. */
+.tile.selected img {
+    outline: 2px solid #e8c860;
+    outline-offset: .35rem;
 }
 
 .tile .label {

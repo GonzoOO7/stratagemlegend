@@ -26,11 +26,11 @@
         "name": "Eagle",
         "stratagemIds": [
           "eagle_rearm",
-          "eagle_500kg_bomb",
           "eagle_strafing_run",
-          "eagle_110mm_rocket_pods",
-          "eagle_airstrike",
           "eagle_cluster_bomb",
+          "eagle_500kg_bomb",
+          "eagle_airstrike",
+          "eagle_110mm_rocket_pods",
           "eagle_gas_airstrike",
           "eagle_napalm_airstrike",
           "eagle_smoke_strike"
@@ -223,9 +223,9 @@
             "id": "mortar",
             "name": "Mortar",
             "stratagemIds": [
+              "mortar_sentry",
               "ems_mortar_sentry",
-              "gas_mortar_sentry",
-              "mortar_sentry"
+              "gas_mortar_sentry"
             ]
           }
         ]
@@ -255,10 +255,10 @@
             "id": "mines",
             "name": "Mines",
             "stratagemIds": [
-              "anti_tank_mines",
-              "gas_mines",
               "anti_personnel_minefield",
-              "incendiary_mines"
+              "incendiary_mines",
+              "gas_mines",
+              "anti_tank_mines"
             ]
           }
         ]

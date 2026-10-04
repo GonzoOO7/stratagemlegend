@@ -638,13 +638,13 @@
   {
     "id": "sssd_delivery_short",
     "prefix": null,
-    "name": "SSSD Delivery",
+    "name": "SSSD Delivery Short",
     "code": "sssww"
   },
   {
     "id": "sssd_delivery_long",
     "prefix": null,
-    "name": "SSSD Delivery",
+    "name": "SSSD Delivery Long",
     "code": "sssssww"
   },
   {

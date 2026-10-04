@@ -9,6 +9,7 @@ let currentPath = [];   // [] == root
 let locked = false;     // true while the correct answer animation plays
 let selectable = [];    // tiles in visual order, for keyboard movement
 let selectedIndex = 0;
+let keyboardMode = false;   // outline only shows once WASD is used
 
 // --- rendering ---------------------------------------------------------------
 
@@ -79,9 +80,10 @@ function renderScreen() {
         addTile(tile, () => answer(id, tile));
     }
 
-    // Start on the first real tile, never the Back row — so that landing in a
-    // folder and mashing Space does not immediately leave it again.
-    select(selectable.findIndex(t => !t.classList.contains("nav")));
+    // Remember where WASD movement starts from — the first real tile, never the
+    // Back row. The outline stays hidden until a key is actually pressed.
+    selectedIndex = Math.max(0, selectable.findIndex(t => !t.classList.contains("nav")));
+    paintSelection();
 }
 
 function navigate(path) {
@@ -97,45 +99,74 @@ function flash(tile, className, ms) {
 
 // --- keyboard ----------------------------------------------------------------
 
+function paintSelection() {
+    selectable.forEach((tile, i) => {
+        tile.classList.toggle("selected", keyboardMode && i === selectedIndex);
+    });
+}
+
 function select(index) {
-    selectable.forEach(t => t.classList.remove("selected"));
     const tile = selectable[index];
     if (!tile) return;
     selectedIndex = index;
-    tile.classList.add("selected");
+    paintSelection();
     tile.scrollIntoView({block: "nearest"});
 }
 
+// Tiles sharing an offsetTop are on the same visual row.
+function rowTiles(top) {
+    return selectable
+        .filter(tile => tile.offsetTop === top)
+        .sort((a, b) => a.offsetLeft - b.offsetLeft);
+}
+
+function rowTops() {
+    return [...new Set(selectable.map(tile => tile.offsetTop))].sort((a, b) => a - b);
+}
+
 // Move to the closest tile in a direction, using real geometry so that wrapped
-// rows and the full-width Back row are handled correctly.
+// rows and the Back tile are handled correctly. Horizontal movement wraps: past
+// the right edge drops to the next row, past the left edge climbs to the
+// previous one.
 function moveSelection(dx, dy) {
     if (!selectable.length) return;
     const from = selectable[selectedIndex];
-    const fTop = from.offsetTop;
-    const fLeft = from.offsetLeft;
 
-    let best = -1;
-    let bestScore = Infinity;
-    selectable.forEach((tile, i) => {
-        if (i === selectedIndex) return;
-        const dTop = tile.offsetTop - fTop;
-        const dLeft = tile.offsetLeft - fLeft;
+    if (dy !== 0) {
+        const fTop = from.offsetTop;
+        const fLeft = from.offsetLeft;
+        let best = -1;
+        let bestScore = Infinity;
+        selectable.forEach((tile, i) => {
+            if (i === selectedIndex) return;
+            const dTop = tile.offsetTop - fTop;
+            const dLeft = tile.offsetLeft - fLeft;
+            const along = dTop * dy;
+            if (along <= 0) return;
+            const score = along + Math.abs(dLeft) * 2;
+            if (score < bestScore) {
+                bestScore = score;
+                best = i;
+            }
+        });
+        if (best >= 0) select(best);
+        return;
+    }
 
-        // Must be in the requested direction: 'up' means meaningfully higher,
-        // etc. The perpendicular axis is scored, not filtered, so a row that
-        // wraps still lets you move left/right along it.
-        const along = dy !== 0 ? dTop * dy : dLeft * dx;
-        const across = dy !== 0 ? Math.abs(dLeft) : Math.abs(dTop);
-        if (along <= 0) return;
+    const row = rowTiles(from.offsetTop);
+    const neighbour = row[row.indexOf(from) + dx];
+    if (neighbour) {
+        select(selectable.indexOf(neighbour));
+        return;
+    }
 
-        const score = along + across * 2;
-        if (score < bestScore) {
-            bestScore = score;
-            best = i;
-        }
-    });
-
-    if (best >= 0) select(best);
+    // At the edge of the row — wrap to the adjacent one.
+    const tops = rowTops();
+    const nextTop = tops[tops.indexOf(from.offsetTop) + dx];
+    if (nextTop === undefined) return;
+    const nextRow = rowTiles(nextTop);
+    if (!nextRow.length) return;
+    select(selectable.indexOf(dx > 0 ? nextRow[0] : nextRow[nextRow.length - 1]));
 }
 
 document.addEventListener("keydown", event => {
@@ -146,14 +177,21 @@ document.addEventListener("keydown", event => {
     if (active && active !== document.body) return;
 
     switch (event.key) {
-        case "w": case "W": moveSelection(0, -1); break;
-        case "s": case "S": moveSelection(0, 1); break;
-        case "a": case "A": moveSelection(-1, 0); break;
-        case "d": case "D": moveSelection(1, 0); break;
+        case "w": case "W": keyboardMode = true; moveSelection(0, -1); break;
+        case "s": case "S": keyboardMode = true; moveSelection(0, 1); break;
+        case "a": case "A": keyboardMode = true; moveSelection(-1, 0); break;
+        case "d": case "D": keyboardMode = true; moveSelection(1, 0); break;
         case " ":
             event.preventDefault();               // don't scroll the page
             selectable[selectedIndex]?.click();
             break;
         default: return;
     }
+});
+
+// Moving the mouse hands control back — the keyboard outline disappears.
+document.addEventListener("mousemove", () => {
+    if (!keyboardMode) return;
+    keyboardMode = false;
+    paintSelection();
 });

@@ -28,3 +28,12 @@ function el(tag, className, props, children) {
 function randomItem(items) {
     return items[Math.floor(Math.random() * items.length)];
 }
+
+// Fisher-Yates, in place.
+function shuffle(items) {
+    for (let i = items.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [items[i], items[j]] = [items[j], items[i]];
+    }
+    return items;
+}

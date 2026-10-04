@@ -21,6 +21,7 @@
           "super_earth_flag",
           "hellbomb",
           "seaf_artillery",
+	  "seismic_probe",
           "orbital_illumination_flare"
         ],
         "subcategories": [
@@ -31,14 +32,6 @@
               "tactical_video_camera",
               "dark_fluid_vessel",
               "portable_hellbomb_mission"
-            ]
-          },
-          {
-            "id": "prospecting",
-            "name": "Prospecting",
-            "stratagemIds": [
-              "seismic_probe",
-              "prospecting_drill"
             ]
           },
           {
@@ -82,8 +75,8 @@
         "name": "Orbital",
         "stratagemIds": [
           "orbital_precision_strike",
-          "orbital_railcannon_strike",
           "orbital_gatling_barrage",
+          "orbital_railcannon_strike",
           "orbital_airburst_strike",
           "orbital_walking_barrage",
           "orbital_120mm_he_barrage",
@@ -155,9 +148,9 @@
                   "machine_gun",
                   "heavy_machine_gun",
                   "grenade_launcher",
-                  "flamethrower",
                   "laser_cannon",
                   "quasar_cannon",
+                  "flamethrower",
                   "arc_thrower",
                   "de_escalator",
                   "epoch",
@@ -309,6 +302,16 @@
         "name": "Emplacement",
         "subcategories": [
           {
+            "id": "mines",
+            "name": "Mines",
+            "stratagemIds": [
+              "anti_personnel_minefield",
+              "incendiary_mines",
+              "gas_mines",
+              "anti_tank_mines"
+            ]
+          },
+          {
             "id": "shield",
             "name": "Shield",
             "stratagemIds": [
@@ -323,16 +326,6 @@
               "anti_tank_emplacement",
               "hmg_emplacement",
               "grenadier_battlement"
-            ]
-          },
-          {
-            "id": "mines",
-            "name": "Mines",
-            "stratagemIds": [
-              "anti_personnel_minefield",
-              "incendiary_mines",
-              "gas_mines",
-              "anti_tank_mines"
             ]
           }
         ]

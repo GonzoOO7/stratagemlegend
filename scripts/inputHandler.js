@@ -8,8 +8,20 @@ const breadcrumb = document.getElementById("breadcrumb");
 let currentPath = [];   // [] == root
 let locked = false;     // true while the correct answer animation plays
 let selectable = [];    // tiles in visual order, for keyboard movement
+let folderPaths = [];   // child paths, index-aligned with the folder tiles
 let selectedIndex = 0;
 let keyboardMode = false;   // outline only shows once WASD is used
+
+// Stratagem ids disproven this round. Clicking one only rules out that one —
+// a folder is never disproven, so the player stays put and keeps every option.
+let eliminated = new Set();
+
+// Folders the player was pushed out of after guessing a wrong branch. Only
+// populated when a rewind actually happens, so wandering off by accident does
+// not rule out a section you merely dipped into.
+let deadFolders = new Set();
+
+const pathKey = path => path.join(">");
 
 // --- rendering ---------------------------------------------------------------
 
@@ -43,6 +55,7 @@ function renderScreen() {
     const node = nodeChildren(currentPath);
     screen.replaceChildren();
     selectable = [];
+    folderPaths = [];
 
     const subcategories = nodeSubcategories(node);
     const stratagemIds = nodeStratagems(node);
@@ -59,6 +72,7 @@ function renderScreen() {
 
     for (const sub of subcategories) {
         const childPath = [...currentPath, sub.name];
+        folderPaths.push(childPath);
         addTile(el("div", "tile folder", {title: sub.name}, [
             el("img", "", {src: Paths.categories + categoryIconPath(childPath), alt: ""}),
             el("span", "label", {textContent: sub.name})
@@ -77,19 +91,70 @@ function renderScreen() {
             el("img", "", {src: stratagemIcon(id), alt: ""}),
             el("span", "label", {textContent: label})
         ]);
+        tile.dataset.id = id;
         addTile(tile, () => answer(id, tile));
     }
 
     // Remember where WASD movement starts from — the first real tile, never the
     // Back row. The outline stays hidden until a key is actually pressed.
     selectedIndex = Math.max(0, selectable.findIndex(t => !t.classList.contains("nav")));
+    applyEliminated();
+    applyTrace();
     paintSelection();
+}
+
+// A dead folder takes its whole subtree with it.
+function isDeadFolder(path) {
+    const key = pathKey(path);
+    for (const dead of deadFolders) {
+        if (key === dead || key.startsWith(dead + ">")) return true;
+    }
+    return false;
+}
+
+// Apply the dimming to whatever is on screen. Called after every render AND
+// after a miss that did not navigate, so the state never drifts from the sets.
+function applyEliminated() {
+    screen.querySelectorAll(".tile.stratagem").forEach(tile => {
+        tile.classList.toggle("eliminated", eliminated.has(tile.dataset.id));
+    });
+    screen.querySelectorAll(".tile.folder").forEach((tile, i) => {
+        tile.classList.toggle("eliminated", isDeadFolder(folderPaths[i]));
+    });
 }
 
 function navigate(path) {
     currentPath = path;
     renderBreadcrumb();
     renderScreen();
+}
+
+// After a Reveal, the next node on the route to the answer is outlined in white.
+// It follows the player down: each render outlines the child they should enter
+// next, until the view holds the answer itself. Nothing off the route — and
+// nothing at all once the player wanders off it — is marked.
+function applyTrace() {
+    if (!revealed || !target) return;
+
+    const path = Data.pathOf[target.id] || [];
+    // Only while the player is on the route, or still above it.
+    if (currentPath.length > path.length) return;
+    if (currentPath.some((name, i) => name !== path[i])) return;
+
+    let tile = null;
+    if (currentPath.length === path.length) {
+        tile = screen.querySelector(`.tile.stratagem[data-id="${target.id}"]`);
+    } else {
+        // folderPaths is index-aligned with the folder tiles, and each entry is
+        // the current path plus one name, so only the last one has to match.
+        const next = path[currentPath.length];
+        const index = folderPaths.findIndex(
+            p => p.length === currentPath.length + 1 && p[p.length - 1] === next
+        );
+        if (index >= 0) tile = screen.querySelectorAll(".tile.folder")[index];
+    }
+
+    if (tile) tile.classList.add("traced");
 }
 
 function flash(tile, className, ms) {

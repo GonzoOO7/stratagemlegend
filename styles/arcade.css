@@ -155,6 +155,47 @@
     outline-offset: .35rem;
 }
 
+/* Ruled out this round. Still clickable — only dimmed. */
+.tile.eliminated img,
+.tile.eliminated .label {
+    opacity: .3;
+    filter: grayscale(1);
+}
+
+.tile.eliminated:hover img {
+    opacity: .55;
+}
+
+/* Reveal: the next node on the route to the answer. Outlined, never selected. */
+.tile.traced img {
+    outline: 2px solid #fff;
+    outline-offset: .35rem;
+    filter: drop-shadow(0 0 .8rem #fff);
+}
+
+.tile.traced .label {
+    color: #fff;
+}
+
+/* Reveal button */
+#reveal {
+    margin-left: 1rem;
+    padding: .2rem .7rem;
+    font-family: HD, sans-serif;
+    font-size: .7rem;
+    text-transform: uppercase;
+    color: #8fa0c0;
+    background: #1b2a4d;
+    border: 1px solid #3a4a6b;
+    border-radius: .2rem;
+    cursor: pointer;
+}
+
+#reveal:hover {
+    color: #fff;
+    border-color: #e8c860;
+}
+
 .tile .label {
     font-family: HD, sans-serif;
     font-size: .62rem;

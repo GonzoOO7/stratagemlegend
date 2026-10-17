@@ -7,3 +7,11 @@ assets/stratagem/
 # stray empty files, never had content
 /npm
 /opencode
+
+# IDE settings (JetBrains)
+.idea/
+styles/.idea/
+
+# private working notes (also in the global gitignore; listed here so it holds
+# on any machine)
+TODO.md

@@ -23,9 +23,9 @@ const LOSE_DELAY = 120;     // ms from the last click to "aw dang it", as in the
 // Gamble Core sounds, with the game's own sounds standing in if a clip is
 // missing. "start" greets you when the page opens; the rest belong to a spin.
 const GambleSfx = {
-    start: {src: "/assets/sfx/gamble/lets go gambling.ogg", fallback: null},
-    stop:  {src: "/assets/sfx/gamble/click.ogg", fallback: "click"},
-    lose:  {src: "/assets/sfx/gamble/aw dang it.ogg", fallback: "wrong"}
+    start: {src: "assets/sfx/gamble/lets go gambling.ogg", fallback: null},
+    stop:  {src: "assets/sfx/gamble/click.ogg", fallback: "click"},
+    lose:  {src: "assets/sfx/gamble/aw dang it.ogg", fallback: "wrong"}
 };
 
 const slotsEl = document.getElementById("slots");

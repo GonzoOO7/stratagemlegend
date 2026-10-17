@@ -96,6 +96,35 @@
       ]
     }
   ],
+  "unique": [
+    {
+      "name": "Tank",
+      "hint": "At most one tank per spin",
+      "ids": [
+        "bastion_mk_xvi",
+        "maelstrom"
+      ]
+    },
+    {
+      "name": "FRV",
+      "hint": "At most one FRV per spin",
+      "ids": [
+        "supply_frv",
+        "gunner_frv",
+        "incinerator_frv"
+      ]
+    },
+    {
+      "name": "Exosuit",
+      "hint": "At most one exosuit per spin",
+      "ids": [
+        "emancipator_exosuit",
+        "patriot_exosuit",
+        "breakthrough_exosuit",
+        "lumberer_exosuit"
+      ]
+    }
+  ],
   "groups": {
     "Elements": {"icon": "elements.png"}
   },

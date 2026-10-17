@@ -45,6 +45,7 @@ let rules = [];             // limits: [{id, name, hint, icon, default (a mode),
 let exempt = [];            // stratagems a cap ignores: [{id, name, hint, icon, default, ids: Set}]
 let elements = [];          // "categories": stratagems by element (fire, gas) or type (bullets, shield), each with a group
 let groupInfo = {};         // group name -> {icon}, from gambleRules.json
+let unique = [];            // always on: at most one of each per spin (a tank, an FRV, an exosuit)
 let activeRules = new Set();    // ids of the exemptions switched on
 let modes = {};             // limit id -> key of MODES
 let savedRules = null;      // from storage, until the rules file is loaded
@@ -144,6 +145,7 @@ async function loadRules() {
     exempt = (data.exempt || []).map(r => ({...r, ids: new Set(r.ids || [])}));
     elements = (data.categories || []).map(r => ({...r, ids: new Set(r.ids || [])}));
     groupInfo = data.groups || {};
+    unique = (data.unique || []).map(r => ({...r, ids: new Set(r.ids || [])}));
 
     // Categories used to be bans of their own; one saved that way becomes its
     // stratagems' switches in the tree, once.
@@ -183,9 +185,14 @@ function limitsOf(s) {
 // any slot.
 function deal(candidates, count) {
     const used = new Map();
-    const fits = s => limitsOf(s).every(r => (used.get(r.id) || 0) < MODES[modes[r.id]].max);
+    // the "unique" groups too: never two tanks, two FRVs or two exosuits -
+    // one of each together is fine
+    const once = s => unique.filter(u => u.ids.has(s.id));
+    const fits = s => limitsOf(s).every(r => (used.get(r.id) || 0) < MODES[modes[r.id]].max)
+        && once(s).every(u => !used.get("unique:" + u.name));
     const take = s => {
         for (const r of limitsOf(s)) used.set(r.id, (used.get(r.id) || 0) + 1);
+        for (const u of once(s)) used.set("unique:" + u.name, 1);
         hand.push(s);
     };
     const hand = [];

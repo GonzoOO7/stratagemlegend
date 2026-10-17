@@ -118,27 +118,6 @@
             "name": "Weapon",
             "subcategories": [
               {
-                "id": "melee",
-                "name": "Melee",
-                "stratagemIds": [
-                  "defoliation_tool",
-                  "breaching_hammer",
-                  "one_true_flag"
-                ]
-              },
-              {
-                "id": "expendable",
-                "name": "Expendable",
-                "stratagemIds": [
-                  "expendable_anti_tank",
-                  "expendable_napalm",
-                  "leveller",
-                  "commando",
-                  "solo_silo",
-                  "bullet_storm"
-                ]
-              },
-              {
                 "id": "handheld",
                 "name": "Handheld",
                 "stratagemIds": [
@@ -157,6 +136,29 @@
                   "sterilizer",
                   "speargun",
                   "meltagun"
+                ],
+                "subcategories": [
+                  {
+                    "id": "melee",
+                    "name": "Melee",
+                    "stratagemIds": [
+                      "defoliation_tool",
+                      "breaching_hammer",
+                      "one_true_flag"
+                    ]
+                  },
+                  {
+                    "id": "expendable",
+                    "name": "Expendable",
+                    "stratagemIds": [
+                      "expendable_anti_tank",
+                      "expendable_napalm",
+                      "leveller",
+                      "commando",
+                      "solo_silo",
+                      "bullet_storm"
+                    ]
+                  }
                 ]
               },
               {

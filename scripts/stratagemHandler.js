@@ -1,5 +1,5 @@
-// One stratagem at a time, endless: show its code, let the player navigate the
-// tree to find it, flash the tile, then deal the next one.
+// One stratagem at a time, endless: show its code, let the player find it on
+// the wheel, flash its cell, then deal the next one.
 
 const codeBoard = document.getElementById("code");
 const streakEl = document.getElementById("streak");

@@ -1,18 +1,20 @@
-// Tree navigation: renders the breadcrumb and the current folder's contents,
-// and handles activating tiles — by click, or by keyboard (WASD to move the
-// selection, Space to confirm).
+// Game navigation on the stratagem ring chart (wheel.js): the current folder is
+// the hub, everything below it the rings around it. Click a folder to open it,
+// a stratagem to answer, the hub (or Backspace / Escape) to go back up. The
+// breadcrumb sits top-left; mouse wheel zooms, dragging pans.
+//
+// Every stratagem below the current folder is on screen at once, so the answer
+// can be clicked from higher up - opening folders just makes the cells bigger.
 
-const screen = document.getElementById("screen");
-const breadcrumb = document.getElementById("breadcrumb");
+const wheel = document.getElementById("wheel");
+const crumbs = document.getElementById("crumbs");
+const tips = Wheel.tooltip(document.getElementById("tip"), {codes: false});
+const zoom = Wheel.zoomable(wheel, {onPanStart: () => tips.hide()});
 
 let currentPath = [];   // [] == root
 let locked = false;     // true while the correct answer animation plays
-let selectable = [];    // tiles in visual order, for keyboard movement
-let folderPaths = [];   // child paths, index-aligned with the folder tiles
-let selectedIndex = 0;
-let keyboardMode = false;   // outline only shows once WASD is used
 
-// Stratagem ids disproven this round. Clicking one only rules out that one —
+// Stratagem ids disproven this round. Clicking one only rules out that one -
 // a folder is never disproven, so the player stays put and keeps every option.
 let eliminated = new Set();
 
@@ -23,100 +25,56 @@ let deadFolders = new Set();
 
 const pathKey = path => path.join(">");
 
+let root = null;
+let drawn = null;       // what Wheel.render returned for the current folder
+
 // --- rendering ---------------------------------------------------------------
 
 function renderBreadcrumb() {
-    breadcrumb.replaceChildren();
-
-    const rootCrumb = el("span", "crumb root", {textContent: "Stratagem Legend"});
-    rootCrumb.addEventListener("click", () => navigate([]));
-    breadcrumb.appendChild(rootCrumb);
-
-    let acc = [];
-    for (const name of currentPath) {
-        acc = [...acc, name];
-        const target = [...acc];
-        const sep = el("span", "sep", {textContent: "›"});
-        const crumb = el("span", "crumb", {textContent: name});
-        crumb.addEventListener("click", () => navigate(target));
-        breadcrumb.append(sep, crumb);
-    }
-}
-
-// Every icon acknowledges the click with the arrow-complete sound. Correct
-// stratagems add the completion sound on top (from answer()), so the two
-// layer rather than replace each other.
-function addTile(tile, onActivate, into) {
-    tile.addEventListener("click", () => {
-        if (locked) return;
-        playSfx("click");
-        onActivate();
+    crumbs.replaceChildren();
+    const trail = [{name: "Stratagem Legend", path: []}];
+    currentPath.forEach((name, i) => trail.push({name, path: currentPath.slice(0, i + 1)}));
+    trail.forEach((step, i) => {
+        if (i) crumbs.appendChild(el("span", "sep", {textContent: "›"}));
+        const crumb = el("span", "crumb", {textContent: step.name});
+        if (i < trail.length - 1) crumb.addEventListener("click", () => activate(() => navigate(step.path)));
+        crumbs.appendChild(crumb);
     });
-    into.appendChild(tile);
-    selectable.push(tile);
 }
 
-// The screen is a two-column, two-row grid:
-//
-//     a b      a = Back, alone in the left column
-//     a c      b = category tiles    c = stratagem tiles
-//
-// The dashed rule between b and c comes from the row gap on .grid-strats.
+// Every click is acknowledged with the arrow-complete sound; correct
+// stratagems add the completion sound on top (from answer()). Nothing reacts
+// during the correct-answer animation, or to the click that ends a pan.
+function activate(fn) {
+    if (locked || zoom.justDragged) return;
+    playSfx("click");
+    fn();
+}
+
 function renderScreen() {
-    const node = nodeChildren(currentPath);
-    screen.replaceChildren();
-    selectable = [];
-    folderPaths = [];
+    if (!root) root = Wheel.buildRoot();
+    const focus = Wheel.find(root, currentPath);
+    drawn = Wheel.render(focus, {
+        folder: node => activate(() => navigate(node.path)),
+        stratagem: (id, cell) => activate(() => answer(id, cell)),
+        enter: (info, event) => {
+            if (!zoom.dragging) tips.show(info, event);
+        },
+        move: tips.move,
+        leave: tips.hide
+    });
 
-    const back = el("div", "grid-back");
-    const cats = el("div", "grid-cats");
-    const stratagems = el("div", "grid-strats");
-    screen.append(back, cats, stratagems);
-
-    const subcategories = nodeSubcategories(node);
-    const stratagemIds = nodeStratagems(node);
-
-    // "cd .." — one level up. At the root there is nowhere to go, so the tile
-    // is drawn dead (see .tile.nav.off) and does nothing.
-    const up = [...currentPath.slice(0, -1)];
-    const backTile = el("div", "tile nav", {title: "Back"}, [
-        el("img", "", {src: Paths.ui + "back.png", alt: "Back"}),
-        el("span", "label", {textContent: "Back"})
-    ]);
+    // The hub is the Back tile; at the root it sits there dead.
+    const hub = Wheel.folderHub(focus, !currentPath.length);
     if (currentPath.length) {
-        addTile(backTile, () => navigate(up), back);
-    } else {
-        backTile.classList.add("off");
-        back.appendChild(backTile);
+        hub.addEventListener("click", () => activate(() => navigate(currentPath.slice(0, -1))));
     }
+    drawn.marks.appendChild(hub);
 
-    for (const sub of subcategories) {
-        const childPath = [...currentPath, sub.name];
-        folderPaths.push(childPath);
-        addTile(el("div", "tile folder", {title: sub.name}, [
-            el("img", "", {src: Paths.categories + categoryIconPath(childPath), alt: ""}),
-            el("span", "label", {textContent: sub.name})
-        ]), () => navigate(childPath), cats);
-    }
-    if (subcategories.length) stratagems.classList.add("ruled");
-
-    for (const id of stratagemIds) {
-        const stratagem = Data.byId[id];
-        const label = (stratagem.prefix ? stratagem.prefix + " " : "") + stratagem.name;
-        const tile = el("div", "tile stratagem", {title: stratagem.name}, [
-            el("img", "", {src: stratagemIcon(id), alt: ""}),
-            el("span", "label", {textContent: label})
-        ]);
-        tile.dataset.id = id;
-        addTile(tile, () => answer(id, tile), stratagems);
-    }
-
-    // Remember where WASD movement starts from — the first real tile, never the
-    // Back row. The outline stays hidden until a key is actually pressed.
-    selectedIndex = Math.max(0, selectable.findIndex(t => !t.classList.contains("nav")));
+    wheel.replaceChildren(Wheel.svgEl("g", {class: "scene"}, [drawn.cells, drawn.marks]));
+    zoom.reset();
     applyEliminated();
     applyTrace();
-    paintSelection();
 }
 
 // A dead folder takes its whole subtree with it.
@@ -128,151 +86,68 @@ function isDeadFolder(path) {
     return false;
 }
 
-// Apply the dimming to whatever is on screen. Called after every render AND
-// after a miss that did not navigate, so the state never drifts from the sets.
+// A class on a cell also goes on its icon, which lives on the layer above.
+function mark(elm, cls, on) {
+    elm.classList.toggle(cls, on);
+    if (elm.icon) elm.icon.classList.toggle(cls, on);
+}
+
+// Dim what is ruled out: stratagems clicked wrong, and every folder the player
+// was pushed out of - with everything inside it, subfolders and stratagems
+// alike. Still clickable. Called after every render AND after a miss that did
+// not navigate, so the state never drifts from the sets.
 function applyEliminated() {
-    screen.querySelectorAll(".tile.stratagem").forEach(tile => {
-        tile.classList.toggle("eliminated", eliminated.has(tile.dataset.id));
-    });
-    screen.querySelectorAll(".tile.folder").forEach((tile, i) => {
-        tile.classList.toggle("eliminated", isDeadFolder(folderPaths[i]));
-    });
+    if (!drawn) return;
+    for (const cell of drawn.stratagems) {
+        mark(cell, "eliminated", eliminated.has(cell.info.id) || isDeadFolder(cell.info.path));
+    }
+    for (const [key, elms] of drawn.folders) {
+        const dead = isDeadFolder(key.split(">"));
+        for (const elm of elms) mark(elm, "eliminated", dead);
+    }
 }
 
 function navigate(path) {
     currentPath = path;
+    tips.hide();
     renderBreadcrumb();
     renderScreen();
 }
 
-// After a Reveal, the next node on the route to the answer is outlined in white.
-// It follows the player down: each render outlines the child they should enter
-// next, until the view holds the answer itself. Nothing off the route — and
-// nothing at all once the player wanders off it — is marked.
+// After a Reveal the whole route below the current folder is outlined in
+// white - every folder on the way and the answer itself, since all of it is
+// on screen at once. Off the route, nothing is marked.
 function applyTrace() {
-    if (!revealed || !target) return;
-
+    if (!drawn || !revealed || !target) return;
     const path = Data.pathOf[target.id] || [];
-    // Only while the player is on the route, or still above it.
     if (currentPath.length > path.length) return;
     if (currentPath.some((name, i) => name !== path[i])) return;
 
-    let tile = null;
-    if (currentPath.length === path.length) {
-        tile = screen.querySelector(`.tile.stratagem[data-id="${target.id}"]`);
-    } else {
-        // folderPaths is index-aligned with the folder tiles, and each entry is
-        // the current path plus one name, so only the last one has to match.
-        const next = path[currentPath.length];
-        const index = folderPaths.findIndex(
-            p => p.length === currentPath.length + 1 && p[p.length - 1] === next
-        );
-        if (index >= 0) tile = screen.querySelectorAll(".tile.folder")[index];
+    const route = [];
+    for (let n = currentPath.length + 1; n <= path.length; n++) {
+        const elms = drawn.folders.get(pathKey(path.slice(0, n))) || [];
+        route.push(...elms.filter(elm => elm.classList.contains("cell")));
     }
-
-    if (tile) tile.classList.add("traced");
-}
-
-function flash(tile, className, ms) {
-    tile.classList.add(className);
-    setTimeout(() => tile.classList.remove(className), ms);
-}
-
-// --- keyboard ----------------------------------------------------------------
-
-function paintSelection() {
-    selectable.forEach((tile, i) => {
-        tile.classList.toggle("selected", keyboardMode && i === selectedIndex);
-    });
-}
-
-function select(index) {
-    const tile = selectable[index];
-    if (!tile) return;
-    selectedIndex = index;
-    paintSelection();
-    tile.scrollIntoView({block: "nearest"});
-}
-
-// Tiles sharing an offsetTop are on the same visual row.
-function rowTiles(top) {
-    return selectable
-        .filter(tile => tile.offsetTop === top)
-        .sort((a, b) => a.offsetLeft - b.offsetLeft);
-}
-
-function rowTops() {
-    return [...new Set(selectable.map(tile => tile.offsetTop))].sort((a, b) => a - b);
-}
-
-// Move to the closest tile in a direction, using real geometry so that wrapped
-// rows and the Back tile are handled correctly. Horizontal movement wraps: past
-// the right edge drops to the next row, past the left edge climbs to the
-// previous one.
-function moveSelection(dx, dy) {
-    if (!selectable.length) return;
-    const from = selectable[selectedIndex];
-
-    if (dy !== 0) {
-        const fTop = from.offsetTop;
-        const fLeft = from.offsetLeft;
-        let best = -1;
-        let bestScore = Infinity;
-        selectable.forEach((tile, i) => {
-            if (i === selectedIndex) return;
-            const dTop = tile.offsetTop - fTop;
-            const dLeft = tile.offsetLeft - fLeft;
-            const along = dTop * dy;
-            if (along <= 0) return;
-            const score = along + Math.abs(dLeft) * 2;
-            if (score < bestScore) {
-                bestScore = score;
-                best = i;
-            }
-        });
-        if (best >= 0) select(best);
-        return;
+    const key = pathKey(path);
+    route.push(...drawn.stratagems.filter(
+        cell => cell.info.id === target.id && pathKey(cell.info.path) === key
+    ));
+    for (const elm of route) {
+        elm.classList.add("traced");
+        elm.parentNode.appendChild(elm);    // on top, so the outline isn't covered
     }
-
-    const row = rowTiles(from.offsetTop);
-    const neighbour = row[row.indexOf(from) + dx];
-    if (neighbour) {
-        select(selectable.indexOf(neighbour));
-        return;
-    }
-
-    // At the edge of the row — wrap to the adjacent one.
-    const tops = rowTops();
-    const nextTop = tops[tops.indexOf(from.offsetTop) + dx];
-    if (nextTop === undefined) return;
-    const nextRow = rowTiles(nextTop);
-    if (!nextRow.length) return;
-    select(selectable.indexOf(dx > 0 ? nextRow[0] : nextRow[nextRow.length - 1]));
 }
 
+function flash(cell, className, ms) {
+    cell.classList.add(className);
+    setTimeout(() => cell.classList.remove(className), ms);
+}
+
+// Keys go up a level too - no pan involved, so only the answer animation blocks.
 document.addEventListener("keydown", event => {
-    if (locked || event.ctrlKey || event.metaKey || event.altKey) return;
-
-    // Only when nothing is focused, so form fields keep their own keys.
-    const active = document.activeElement;
-    if (active && active !== document.body) return;
-
-    switch (event.key) {
-        case "w": case "W": keyboardMode = true; moveSelection(0, -1); break;
-        case "s": case "S": keyboardMode = true; moveSelection(0, 1); break;
-        case "a": case "A": keyboardMode = true; moveSelection(-1, 0); break;
-        case "d": case "D": keyboardMode = true; moveSelection(1, 0); break;
-        case " ":
-            event.preventDefault();               // don't scroll the page
-            selectable[selectedIndex]?.click();
-            break;
-        default: return;
-    }
-});
-
-// Moving the mouse hands control back — the keyboard outline disappears.
-document.addEventListener("mousemove", () => {
-    if (!keyboardMode) return;
-    keyboardMode = false;
-    paintSelection();
+    if (event.key !== "Backspace" && event.key !== "Escape") return;
+    event.preventDefault();
+    if (locked || !currentPath.length) return;
+    playSfx("click");
+    navigate(currentPath.slice(0, -1));
 });

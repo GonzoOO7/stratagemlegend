@@ -6,8 +6,7 @@ const Data = {
     roots: [],        // top-level tree nodes
     byId: {},         // id -> stratagem
     pathOf: {},       // id -> [category names] to reach it (first occurrence)
-    iconOf: {},       // id -> icon filename
-    sharedIcons: new Set()  // ids whose icon is reused by another stratagem
+    iconOf: {}        // id -> icon filename
 };
 
 async function loadData() {
@@ -22,17 +21,6 @@ async function loadData() {
     Data.byId = Object.fromEntries(list.map(s => [s.id, s]));
     Data.iconOf = icons;
     Data.pathOf = indexPaths(tree);
-
-    // An icon used by more than one stratagem makes those stratagems
-    // indistinguishable in the grid, so their folder gets name labels.
-    const usage = {};
-    for (const [id, file] of Object.entries(icons)) {
-        (usage[file] ||= []).push(id);
-    }
-    Data.sharedIcons = new Set(
-        Object.values(usage).filter(ids => ids.length > 1).flat()
-    );
-
     return Data;
 }
 
@@ -75,24 +63,4 @@ function indexPaths(roots) {
 
     walk(roots, []);
     return pathOf;
-}
-
-// The current node is either the root (null) or a node with a `path` breadcrumb.
-function nodeSubcategories(node) {
-    return node ? node.subcategories || [] : Data.roots;
-}
-
-function nodeStratagems(node) {
-    return node ? node.stratagemIds || [] : [];
-}
-
-function nodeChildren(path) {
-    let nodes = Data.roots;
-    let node = null;
-    for (const name of path) {
-        node = (nodes || []).find(n => n.name === name);
-        if (!node) return null;
-        nodes = node.subcategories;
-    }
-    return node;
 }

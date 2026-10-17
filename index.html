@@ -5,9 +5,10 @@
     <title>Stratagem Legend</title>
     <link rel="icon" href="assets/icons/categories/offensive_eagle.png" type="image/png">
     <link href="styles/global.css" rel="stylesheet">
-    <link href="styles/arcade.css" rel="stylesheet">
+    <link href="styles/wheel.css" rel="stylesheet">
+    <link href="styles/game.css" rel="stylesheet">
 </head>
-<body id="page">
+<body id="page" class="wheel-page game-page">
 <nav id="pages">
     <span class="page-btn current" aria-current="page">
         <img src="assets/icons/categories/offensive_eagle.png" alt="">game
@@ -19,24 +20,25 @@
         <img src="assets/icons/stratagems/resupply.png" alt="">gambling
     </a>
 </nav>
-<div id="arcade">
-    <div id="prompt">
-        <div id="code"></div>
-        <div id="hud">
-            <span id="misses-label">misses</span>
-            <span id="misses">0</span>
-            <span id="streak-label">streak</span>
-            <span id="streak">0</span>
-            <button id="reveal" type="button">reveal</button>
-        </div>
+<nav id="crumbs"></nav>
+<div id="prompt">
+    <div id="code"></div>
+    <div id="hud">
+        <span id="misses-label">misses</span>
+        <span id="misses">0</span>
+        <span id="streak-label">streak</span>
+        <span id="streak">0</span>
+        <button id="reveal" type="button">reveal</button>
     </div>
-    <nav id="breadcrumb"></nav>
-    <div id="screen"></div>
 </div>
+<svg id="wheel" class="wheel"></svg>
+<div id="help">find the stratagem for the code · click a folder to open it · click the centre to go back · wheel to zoom · drag to pan</div>
+<div id="tip" hidden></div>
 </body>
 <script src="scripts/settings.js"></script>
 <script src="scripts/util.js"></script>
 <script src="scripts/data.js"></script>
+<script src="scripts/wheel.js"></script>
 <script src="scripts/stratagemHandler.js"></script>
 <script src="scripts/inputHandler.js"></script>
 <script src="scripts/load.js"></script>

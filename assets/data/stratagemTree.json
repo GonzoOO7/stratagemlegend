@@ -120,24 +120,28 @@
               {
                 "id": "handheld",
                 "name": "Handheld",
-                "stratagemIds": [
-                  "anti_materiel_rifle",
-                  "railgun",
-                  "grenade_launcher",
-                  "stalwart",
-                  "machine_gun",
-                  "heavy_machine_gun",
-                  "laser_cannon",
-                  "quasar_cannon",
-                  "flamethrower",
-                  "arc_thrower",
-                  "de_escalator",
-                  "epoch",
-                  "sterilizer",
-                  "speargun",
-                  "meltagun"
-                ],
                 "subcategories": [
+                  {
+                    "id": "normal",
+                    "name": "Normal",
+                    "stratagemIds": [
+                      "anti_materiel_rifle",
+                      "railgun",
+                      "grenade_launcher",
+                      "stalwart",
+                      "machine_gun",
+                      "heavy_machine_gun",
+                      "laser_cannon",
+                      "quasar_cannon",
+                      "flamethrower",
+                      "arc_thrower",
+                      "de_escalator",
+                      "epoch",
+                      "sterilizer",
+                      "speargun",
+                      "meltagun"
+                    ]
+                  },
                   {
                     "id": "melee",
                     "name": "Melee",

@@ -5,9 +5,10 @@
     <title>Stratagem Legend · Viewer</title>
     <link rel="icon" href="assets/icons/ui/viewer.png" type="image/png">
     <link href="styles/global.css" rel="stylesheet">
+    <link href="styles/wheel.css" rel="stylesheet">
     <link href="styles/tree.css" rel="stylesheet">
 </head>
-<body id="page" class="tree-page">
+<body id="page" class="wheel-page tree-page">
 <nav id="pages">
     <a class="page-btn" href="index.html">
         <img src="assets/icons/categories/offensive_eagle.png" alt="">game
@@ -20,12 +21,13 @@
     </a>
 </nav>
 <nav id="crumbs"></nav>
-<svg id="wheel"></svg>
+<svg id="wheel" class="wheel"></svg>
 <div id="help">click a folder or stratagem to open it · click the centre to go back · wheel to zoom · drag to pan</div>
 <div id="tip" hidden></div>
 </body>
 <script src="scripts/settings.js"></script>
 <script src="scripts/util.js"></script>
 <script src="scripts/data.js"></script>
+<script src="scripts/wheel.js"></script>
 <script src="scripts/tree.js"></script>
 </html>

@@ -180,7 +180,7 @@ const Wheel = (() => {
 
         const cells = svgEl("g");
         const marks = svgEl("g");
-        const folders = new Map();      // path key -> [folder group, fillers...]
+        const folders = new Map();      // path key -> [folder group]
         const stratagems = [];          // stratagem groups, in drawing order
         let lit = [];
 
@@ -256,10 +256,10 @@ const Wheel = (() => {
                 icon: Paths.categories + categoryIconPath(node.path),
                 maxIcon: 57
             });
-            drawChildren(node, depth, a0, a1, r1, fill);
+            drawChildren(node, depth, a0, a1, r1);
         }
 
-        function drawChildren(node, depth, a0, a1, r1, fill) {
+        function drawChildren(node, depth, a0, a1, r1) {
             const per = (a1 - a0) / node.weight;
             let a = a0;
             node.subs.forEach((sub, i) => {
@@ -268,16 +268,10 @@ const Wheel = (() => {
                 a += span;
             });
 
-            // A folder holding both subfolders and stratagems: carry it out to
-            // the leaf ring above its own stratagems so they still touch it.
-            if (node.leaves.length && r1 < leafR0) {
-                const filler = svgEl("path", {
-                    d: sectorPath(r1, leafR0, a, a1), fill, class: "filler"
-                });
-                register(node.path, filler);
-                cells.appendChild(filler);
-            }
-
+            // A folder holding both subfolders and stratagems (Tesla Tower in
+            // Emplacement): its stratagems stay in the outer ring with all the
+            // others, and the gap between them and the folder is left open -
+            // transparent, no empty panel.
             const hue = hueOf(node.path);
             node.leaves.forEach((id, i) => {
                 cell({
@@ -290,7 +284,7 @@ const Wheel = (() => {
             });
         }
 
-        drawChildren(focus, 0, START, START + FULL, CENTER_R, shade(hueOf(focus.path), 0, false));
+        drawChildren(focus, 0, START, START + FULL, CENTER_R);
         return {cells, marks, folders, stratagems, unlight};
     }
 

@@ -648,6 +648,7 @@ function buildOptions() {
         col.appendChild(wrap);
     }
     typesEl.prepend(col);
+    hideBlankIcons(typesEl);
 }
 
 // Every stratagem icon is fetched once up front, so the rolling reels never

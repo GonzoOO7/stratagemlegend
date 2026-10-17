@@ -5,8 +5,7 @@
     user-select: none;
 }
 
-.wheel .cell path,
-.wheel .filler {
+.wheel .cell path {
     stroke: #0a0a1f;
     stroke-width: 1.5;
     stroke-linejoin: round;
@@ -14,8 +13,7 @@
 
 /* The folders above whatever is hovered. Kept before :hover so the hovered
    cell itself still wins with the stronger brightness. */
-.wheel .cell.lit path,
-.wheel .filler.lit {
+.wheel .cell.lit path {
     filter: brightness(1.35);
 }
 

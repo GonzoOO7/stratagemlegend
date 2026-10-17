@@ -80,7 +80,6 @@
 /* Ruled out this round - and everything inside a ruled-out folder. Dimmed,
    still clickable. */
 .wheel .cell.eliminated path,
-.wheel .filler.eliminated,
 .wheel image.eliminated {
     opacity: .3;
     filter: grayscale(1);

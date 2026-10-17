@@ -4,7 +4,7 @@
 
 @font-face {
     font-family: HD;
-    src: url("/assets/font/RobotoSlab.ttf");
+    src: url("../assets/font/RobotoSlab.ttf");
     font-display: swap;
 }
 

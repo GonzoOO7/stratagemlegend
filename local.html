@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Stratagem Legend</title>
+    <link rel="icon" href="assets/icons/stratagems/reinforce.png" type="image/png">
+    <link href="styles/global.css" rel="stylesheet">
+    <link href="styles/arcade.css" rel="stylesheet">
+</head>
+<body id="page">
+<div id="arcade">
+    <div id="prompt">
+        <div id="code"></div>
+        <div id="hud">
+            <span id="misses-label">misses</span>
+            <span id="misses">0</span>
+            <span id="streak-label">streak</span>
+            <span id="streak">0</span>
+            <button id="reveal" type="button">reveal</button>
+        </div>
+    </div>
+    <nav id="breadcrumb"></nav>
+    <div id="screen"></div>
+</div>
+<script>
+// Loads the stratagem list, the category tree and the id->icon map, and exposes
+// lookups for both icons and tree navigation.
+
+const Data = {
+    stratagems: [],   // [{id, name, prefix, code}]
+    roots: [],        // top-level tree nodes
+    byId: {},         // id -> stratagem
+    pathOf: {},       // id -> [category names] to reach it (first occurrence)
+    iconOf: {},       // id -> icon filename
+    sharedIcons: new Set()  // ids whose icon is reused by another stratagem
+};
+
+const STRATAGEMS = [{"id": "orbital_precision_strike", "prefix": null, "name": "Orbital Precision Strike", "code": "ddw"}, {"id": "orbital_gatling_barrage", "prefix": null, "name": "Orbital Gatling Barrage", "code": "dsaww"}, {"id": "orbital_gas_strike", "prefix": null, "name": "Orbital Gas Strike", "code": "ddsd"}, {"id": "orbital_120mm_he_barrage", "prefix": null, "name": "Orbital 120mm HE Barrage", "code": "ddsads"}, {"id": "orbital_airburst_strike", "prefix": null, "name": "Orbital Airburst Strike", "code": "ddd"}, {"id": "orbital_smoke_strike", "prefix": null, "name": "Orbital Smoke Strike", "code": "ddsw"}, {"id": "orbital_ems_strike", "prefix": null, "name": "Orbital EMS Strike", "code": "ddas"}, {"id": "orbital_380mm_he_barrage", "prefix": null, "name": "Orbital 380mm HE Barrage", "code": "dswwass"}, {"id": "orbital_walking_barrage", "prefix": null, "name": "Orbital Walking Barrage", "code": "dsdsds"}, {"id": "orbital_laser", "prefix": null, "name": "Orbital Laser", "code": "dswds"}, {"id": "orbital_napalm_barrage", "prefix": null, "name": "Orbital Napalm Barrage", "code": "ddsadw"}, {"id": "orbital_railcannon_strike", "prefix": null, "name": "Orbital Railcannon Strike", "code": "dwssd"}, {"id": "eagle_gas_airstrike", "prefix": null, "name": "Eagle Gas Airstrike", "code": "wdad"}, {"id": "eagle_strafing_run", "prefix": null, "name": "Eagle Strafing Run", "code": "wdd"}, {"id": "eagle_airstrike", "prefix": null, "name": "Eagle Airstrike", "code": "wdsd"}, {"id": "eagle_cluster_bomb", "prefix": null, "name": "Eagle Cluster Bomb", "code": "wdssd"}, {"id": "eagle_smoke_strike", "prefix": null, "name": "Eagle Smoke Strike", "code": "wdws"}, {"id": "eagle_napalm_airstrike", "prefix": null, "name": "Eagle Napalm Airstrike", "code": "wdsw"}, {"id": "eagle_110mm_rocket_pods", "prefix": null, "name": "Eagle 110mm Rocket Pods", "code": "wdwa"}, {"id": "eagle_500kg_bomb", "prefix": null, "name": "Eagle 500kg Bomb", "code": "wdsss"}, {"id": "machine_gun", "prefix": "MG-43", "name": "Machine Gun", "code": "saswd"}, {"id": "expendable_anti_tank", "prefix": "EAT-17", "name": "Expendable Anti-Tank", "code": "ssawd"}, {"id": "stalwart", "prefix": "M-105", "name": "Stalwart", "code": "saswwa"}, {"id": "laser_cannon", "prefix": "LAS-98", "name": "Laser Cannon", "code": "saswa"}, {"id": "anti_materiel_rifle", "prefix": "APW-1", "name": "Anti-Materiel Rifle", "code": "sadws"}, {"id": "recoilless_rifle", "prefix": "GR-8", "name": "Recoilless Rifle", "code": "sadda"}, {"id": "grenade_launcher", "prefix": "GL-21", "name": "Grenade Launcher", "code": "sawas"}, {"id": "flamethrower", "prefix": "FLAM-40", "name": "Flamethrower", "code": "sawsw"}, {"id": "heavy_machine_gun", "prefix": "MG-206", "name": "Heavy Machine Gun", "code": "sawss"}, {"id": "autocannon", "prefix": "AC-8", "name": "Autocannon", "code": "saswwd"}, {"id": "arc_thrower", "prefix": "ARC-3", "name": "Arc Thrower", "code": "sdswaa"}, {"id": "quasar_cannon", "prefix": "LAS-99", "name": "Quasar Cannon", "code": "sswad"}, {"id": "airburst_rocket_launcher", "prefix": "RL-77", "name": "Airburst Rocket Launcher", "code": "swwad"}, {"id": "commando", "prefix": "MLS-4X", "name": "Commando", "code": "sawsd"}, {"id": "spear", "prefix": "FAF-14", "name": "Spear", "code": "sswss"}, {"id": "railgun", "prefix": "RS-422", "name": "Railgun", "code": "sdswad"}, {"id": "wasp_launcher", "prefix": "StA-X3", "name": "W.A.S.P. Launcher", "code": "sswsd"}, {"id": "breaching_hammer", "prefix": "CQC-20", "name": "Breaching Hammer", "code": "sadaw"}, {"id": "epoch", "prefix": "PLAS-45", "name": "Epoch", "code": "sawad"}, {"id": "bullet_storm", "prefix": "MGX-42", "name": "Bullet Storm", "code": "sasdwa"}, {"id": "speargun", "prefix": "S-11", "name": "Speargun", "code": "sdsawd"}, {"id": "defoliation_tool", "prefix": "CQC-9", "name": "Defoliation Tool", "code": "sadds"}, {"id": "de_escalator", "prefix": "GL-52", "name": "De-Escalator", "code": "sdwad"}, {"id": "expendable_napalm", "prefix": "EAT-700", "name": "Expendable Napalm", "code": "ssawa"}, {"id": "sterilizer", "prefix": "TX-41", "name": "Sterilizer", "code": "sawsa"}, {"id": "leveller", "prefix": "EAT-411", "name": "Leveller", "code": "ssaws"}, {"id": "belt_fed_grenade_launcher", "prefix": "GL-28", "name": "Belt-Fed Grenade Launcher", "code": "sawaww"}, {"id": "c4_pack", "prefix": "B/MD", "name": "C4 Pack", "code": "sdwwdw"}, {"id": "solo_silo", "prefix": "MS-11", "name": "Solo Silo", "code": "swdss"}, {"id": "cremator", "prefix": "B/FLAM-80", "name": "Cremator", "code": "ssdsww"}, {"id": "maxigun", "prefix": "M-1000", "name": "Maxigun", "code": "sadsww"}, {"id": "one_true_flag", "prefix": "CQC-1", "name": "One True Flag", "code": "saddw"}, {"id": "meltagun", "prefix": "40-K", "name": "Meltagun", "code": "sawaas"}, {"id": "supply_pack", "prefix": "B-1", "name": "Supply Pack", "code": "saswws"}, {"id": "jump_pack", "prefix": "LIFT-850", "name": "Jump Pack", "code": "swwsw"}, {"id": "ballistic_shield_backpack", "prefix": "SH-20", "name": "Ballistic Shield Backpack", "code": "sasswa"}, {"id": "guard_dog", "prefix": "AX/AR-23", "name": "Guard Dog", "code": "swawds"}, {"id": "rover", "prefix": "AX/LAS-5", "name": "Rover", "code": "swawdd"}, {"id": "shield_generator_pack", "prefix": "SH-32", "name": "Shield Generator Pack", "code": "swadad"}, {"id": "directional_shield", "prefix": "SH-51", "name": "Directional Shield", "code": "swadww"}, {"id": "hot_dog", "prefix": "AX/FLAM-75", "name": "Hot Dog", "code": "swawaa"}, {"id": "portable_hellbomb", "prefix": "B-100", "name": "Portable Hellbomb", "code": "sdwww"}, {"id": "portable_hellbomb_mission", "prefix": "B-100", "name": "Portable Hellbomb", "code": "sdwws"}, {"id": "k_9", "prefix": "AX/ARC-3", "name": "K-9", "code": "swawda"}, {"id": "hover_pack", "prefix": "LIFT-860", "name": "Hover Pack", "code": "swwsad"}, {"id": "dog_breath", "prefix": "AX/TX-13", "name": "Dog Breath", "code": "swawdw"}, {"id": "warp_pack", "prefix": "LIFT-182", "name": "Warp Pack", "code": "sadsad"}, {"id": "supply_frv", "prefix": "M-103", "name": "Supply FRV", "code": "asaaswd"}, {"id": "maelstrom", "prefix": "TD-110", "name": "Maelstrom", "code": "asdsaswad"}, {"id": "incinerator_frv", "prefix": "M-104", "name": "Incinerator FRV", "code": "asdasww"}, {"id": "emancipator_exosuit", "prefix": "EXO-49", "name": "Emancipator Exosuit", "code": "asdwasw"}, {"id": "patriot_exosuit", "prefix": "EXO-45", "name": "Patriot Exosuit", "code": "asdwass"}, {"id": "gunner_frv", "prefix": "M-102", "name": "Gunner FRV", "code": "asdsdsw"}, {"id": "bastion_mk_xvi", "prefix": "TD-220", "name": "Bastion MK XVI", "code": "asdsaswsw"}, {"id": "breakthrough_exosuit", "prefix": "EXO-55", "name": "Breakthrough Exosuit", "code": "asdadsw"}, {"id": "lumberer_exosuit", "prefix": "EXO-51", "name": "Lumberer Exosuit", "code": "asdwdaw"}, {"id": "machine_gun_sentry", "prefix": "A/MG-43", "name": "Machine Gun Sentry", "code": "swddw"}, {"id": "gatling_sentry", "prefix": "A/G-16", "name": "Gatling Sentry", "code": "swda"}, {"id": "autocannon_sentry", "prefix": "A/AC-8", "name": "Autocannon Sentry", "code": "swdwaw"}, {"id": "mortar_sentry", "prefix": "A/M-12", "name": "Mortar Sentry", "code": "swdds"}, {"id": "rocket_sentry", "prefix": "A/MLS-4X", "name": "Rocket Sentry", "code": "swdda"}, {"id": "tesla_tower", "prefix": "A/ARC-3", "name": "Tesla Tower", "code": "swdwad"}, {"id": "ems_mortar_sentry", "prefix": "A/M-23", "name": "EMS Mortar Sentry", "code": "swdsd"}, {"id": "laser_sentry", "prefix": "A/LAS-98", "name": "Laser Sentry", "code": "swdswd"}, {"id": "flame_sentry", "prefix": "A/FLAM-40", "name": "Flame Sentry", "code": "swdsww"}, {"id": "gas_mortar_sentry", "prefix": "A/GM-17", "name": "Gas Mortar Sentry", "code": "swdsa"}, {"id": "anti_personnel_minefield", "prefix": "MD-6", "name": "Anti-Personnel Minefield", "code": "sawd"}, {"id": "incendiary_mines", "prefix": "MD-I4", "name": "Incendiary Mines", "code": "saas"}, {"id": "anti_tank_mines", "prefix": "MD-17", "name": "Anti-Tank Mines", "code": "saww"}, {"id": "shield_generator_relay", "prefix": "FX-12", "name": "Shield Generator Relay", "code": "ssadad"}, {"id": "hmg_emplacement", "prefix": "E/MG-101", "name": "HMG Emplacement", "code": "swadda"}, {"id": "grenadier_battlement", "prefix": "E/GL-21", "name": "Grenadier Battlement", "code": "sdsad"}, {"id": "gas_mines", "prefix": "MD-8", "name": "Gas Mines", "code": "saad"}, {"id": "anti_tank_emplacement", "prefix": "E/AT-12", "name": "Anti-Tank Emplacement", "code": "swaddd"}, {"id": "eagle_rearm", "prefix": null, "name": "Eagle Rearm", "code": "wwawd"}, {"id": "call_in_super_destroyer", "prefix": null, "name": "Call In Super Destroyer", "code": "wwssadad"}, {"id": "sos_beacon", "prefix": null, "name": "SoS Beacon", "code": "wsdw"}, {"id": "resupply", "prefix": null, "name": "Resupply", "code": "sswd"}, {"id": "reinforce", "prefix": null, "name": "Reinforce", "code": "wsdaw"}, {"id": "dark_fluid_vessel", "prefix": null, "name": "Dark Fluid Vessel", "code": "wadsww"}, {"id": "seaf_artillery", "prefix": null, "name": "SEAF Artillery", "code": "dwws"}, {"id": "portable_comms_relay", "prefix": null, "name": "Portable Comms Relay", "code": "wwssaas"}, {"id": "tactical_video_camera", "prefix": null, "name": "Tactical Video Camera", "code": "dsswaaw"}, {"id": "upload_data", "prefix": null, "name": "Upload Data", "code": "adwww"}, {"id": "seismic_probe", "prefix": null, "name": "Seismic Probe", "code": "wwadss"}, {"id": "super_earth_flag", "prefix": null, "name": "Super Earth Flag", "code": "swsw"}, {"id": "sssd_delivery_short", "prefix": null, "name": "SSSD Delivery Short", "code": "sssww"}, {"id": "sssd_delivery_long", "prefix": null, "name": "SSSD Delivery Long", "code": "sssssww"}, {"id": "cargo_container", "prefix": null, "name": "Cargo Container", "code": "wwssds"}, {"id": "activate_e_711_extraction_drill", "prefix": null, "name": "Activate E-711 Extraction Drill", "code": "ssaass"}, {"id": "hive_breaker_drill", "prefix": null, "name": "Hive Breaker Drill", "code": "awsdss"}, {"id": "prospecting_drill", "prefix": null, "name": "Prospecting Drill", "code": "ssadss"}, {"id": "aquifer_drill", "prefix": null, "name": "Aquifer Drill", "code": "aaawsdss"}, {"id": "tectonic_drill", "prefix": null, "name": "Tectonic Drill", "code": "wswsws"}, {"id": "hellbomb", "prefix": "NUX-223", "name": "Hellbomb", "code": "swaswdsw"}, {"id": "orbital_illumination_flare", "prefix": null, "name": "Orbital Illumination Flare", "code": "ddaa"}];
+const TREE = [{"id": "mission", "name": "Mission", "subcategories": [{"id": "ship", "name": "Ship", "stratagemIds": ["reinforce", "sos_beacon", "resupply", "eagle_rearm", "call_in_super_destroyer"]}, {"id": "objective", "name": "Objective", "stratagemIds": ["super_earth_flag", "hellbomb", "seaf_artillery", "seismic_probe", "orbital_illumination_flare"], "subcategories": [{"id": "equipment", "name": "Equipment", "stratagemIds": ["tactical_video_camera", "dark_fluid_vessel", "portable_hellbomb_mission"]}, {"id": "drill", "name": "Drill", "stratagemIds": ["prospecting_drill", "hive_breaker_drill", "tectonic_drill", "activate_e_711_extraction_drill", "aquifer_drill"]}, {"id": "sssd", "name": "SSSD", "stratagemIds": ["upload_data", "sssd_delivery_short", "sssd_delivery_long"]}, {"id": "containers", "name": "Containers", "stratagemIds": ["portable_comms_relay", "cargo_container"]}]}]}, {"id": "offensive", "name": "Offensive", "subcategories": [{"id": "orbital", "name": "Orbital", "stratagemIds": ["orbital_precision_strike", "orbital_gatling_barrage", "orbital_railcannon_strike", "orbital_airburst_strike", "orbital_walking_barrage", "orbital_120mm_he_barrage", "orbital_380mm_he_barrage", "orbital_napalm_barrage", "orbital_laser", "orbital_ems_strike", "orbital_gas_strike", "orbital_smoke_strike"]}, {"id": "eagle", "name": "Eagle", "stratagemIds": ["eagle_rearm", "eagle_strafing_run", "eagle_cluster_bomb", "eagle_airstrike", "eagle_500kg_bomb", "eagle_110mm_rocket_pods", "eagle_gas_airstrike", "eagle_napalm_airstrike", "eagle_smoke_strike"]}]}, {"id": "support", "name": "Support", "subcategories": [{"id": "equipment", "name": "Equipment", "subcategories": [{"id": "weapon", "name": "Weapon", "subcategories": [{"id": "melee", "name": "Melee", "stratagemIds": ["defoliation_tool", "breaching_hammer", "one_true_flag"]}, {"id": "expendable", "name": "Expendable", "stratagemIds": ["expendable_anti_tank", "expendable_napalm", "leveller", "commando", "solo_silo", "bullet_storm"]}, {"id": "handheld", "name": "Handheld", "stratagemIds": ["anti_materiel_rifle", "railgun", "grenade_launcher", "stalwart", "machine_gun", "heavy_machine_gun", "laser_cannon", "quasar_cannon", "flamethrower", "arc_thrower", "de_escalator", "epoch", "sterilizer", "speargun", "meltagun"]}, {"id": "backpack_gun", "name": "Backpack", "subcategories": [{"id": "team_reload", "name": "Team reload", "stratagemIds": ["airburst_rocket_launcher", "autocannon", "recoilless_rifle", "spear", "wasp_launcher", "c4_pack"]}, {"id": "belt_fed", "name": "belt fed", "stratagemIds": ["maxigun", "belt_fed_grenade_launcher", "cremator"]}]}]}, {"id": "backpack", "name": "Backpack", "stratagemIds": ["supply_pack", "portable_hellbomb", "c4_pack"], "subcategories": [{"id": "movement", "name": "Movement", "stratagemIds": ["jump_pack", "hover_pack", "warp_pack"]}, {"id": "shield", "name": "Shield", "stratagemIds": ["ballistic_shield_backpack", "shield_generator_pack", "directional_shield"]}, {"id": "dog", "name": "Dog", "stratagemIds": ["guard_dog", "rover", "dog_breath", "k_9", "hot_dog"]}]}]}, {"id": "vehicle", "name": "Vehicle", "subcategories": [{"id": "tank", "name": "Tank", "stratagemIds": ["bastion_mk_xvi", "maelstrom"]}, {"id": "frv", "name": "FRV", "stratagemIds": ["supply_frv", "gunner_frv", "incinerator_frv"]}, {"id": "exosuit", "name": "Exosuit", "stratagemIds": ["emancipator_exosuit", "patriot_exosuit", "breakthrough_exosuit", "lumberer_exosuit"]}]}]}, {"id": "defensive", "name": "Defensive", "subcategories": [{"id": "sentry", "name": "Sentry", "subcategories": [{"id": "direct", "name": "Direct", "stratagemIds": ["machine_gun_sentry", "gatling_sentry", "autocannon_sentry", "rocket_sentry", "laser_sentry", "flame_sentry", "tesla_tower"]}, {"id": "mortar", "name": "Mortar", "stratagemIds": ["mortar_sentry", "ems_mortar_sentry", "gas_mortar_sentry"]}]}, {"id": "emplacement", "name": "Emplacement", "stratagemIds": ["tesla_tower"], "subcategories": [{"id": "mines", "name": "Mines", "stratagemIds": ["anti_personnel_minefield", "incendiary_mines", "gas_mines", "anti_tank_mines"]}, {"id": "shield", "name": "Shield", "stratagemIds": ["shield_generator_relay", "grenadier_battlement"]}, {"id": "mountable", "name": "Mountable", "stratagemIds": ["anti_tank_emplacement", "hmg_emplacement", "grenadier_battlement"]}]}]}];
+const ICON_MAP = {"activate_e_711_extraction_drill": "drill.png", "airburst_rocket_launcher": "airburst_rocket_launcher.png", "anti_materiel_rifle": "anti_materiel_rifle.png", "anti_personnel_minefield": "anti_personnel_minefield.png", "anti_tank_emplacement": "anti_tank_emplacement.png", "anti_tank_mines": "anti_tank_mines.png", "aquifer_drill": "drill.png", "arc_thrower": "arc_thrower.png", "autocannon": "autocannon.png", "autocannon_sentry": "autocannon_sentry.png", "ballistic_shield_backpack": "ballistic_shield_backpack.png", "bastion_mk_xvi": "bastion_mk_xvi.png", "belt_fed_grenade_launcher": "belt_fed_grenade_launcher.png", "breaching_hammer": "breaching_hammer.png", "breakthrough_exosuit": "breakthrough_exosuit.png", "bullet_storm": "bullet_storm.png", "c4_pack": "c4_pack.png", "call_in_super_destroyer": "call_in_super_destroyer.png", "cargo_container": "cargo_container.png", "commando": "commando.png", "cremator": "cremator.png", "dark_fluid_vessel": "dark_fluid_vessel.png", "de_escalator": "de_escalator.png", "defoliation_tool": "defoliation_tool.png", "directional_shield": "directional_shield.png", "dog_breath": "dog_breath.png", "eagle_110mm_rocket_pods": "eagle_110mm_rocket_pods.png", "eagle_500kg_bomb": "eagle_500kg_bomb.png", "eagle_airstrike": "eagle_airstrike.png", "eagle_cluster_bomb": "eagle_cluster_bomb.png", "eagle_gas_airstrike": "eagle_gas_airstrike.png", "eagle_napalm_airstrike": "eagle_napalm_airstrike.png", "eagle_rearm": "eagle_rearm.png", "eagle_smoke_strike": "eagle_smoke_strike.png", "eagle_strafing_run": "eagle_strafing_run.png", "emancipator_exosuit": "emancipator_exosuit.png", "ems_mortar_sentry": "ems_mortar_sentry.png", "epoch": "epoch.png", "expendable_anti_tank": "expendable_anti_tank.png", "expendable_napalm": "expendable_napalm.png", "flame_sentry": "flame_sentry.png", "flamethrower": "flamethrower.png", "gas_mines": "gas_mines.png", "gas_mortar_sentry": "gas_mortar_sentry.png", "gatling_sentry": "gatling_sentry.png", "grenade_launcher": "grenade_launcher.png", "grenadier_battlement": "grenadier_battlement.png", "guard_dog": "guard_dog.png", "gunner_frv": "gunner_frv.png", "heavy_machine_gun": "heavy_machine_gun.png", "hellbomb": "hellbomb.png", "hive_breaker_drill": "drill.png", "hmg_emplacement": "hmg_emplacement.png", "hot_dog": "hot_dog.png", "hover_pack": "hover_pack.png", "incendiary_mines": "incendiary_mines.png", "incinerator_frv": "incinerator_frv.png", "jump_pack": "jump_pack.png", "k_9": "k_9.png", "laser_cannon": "laser_cannon.png", "laser_sentry": "laser_sentry.png", "leveller": "leveller.png", "lumberer_exosuit": "lumberer_exosuit.png", "machine_gun": "machine_gun.png", "machine_gun_sentry": "machine_gun_sentry.png", "maelstrom": "maelstrom.png", "maxigun": "maxigun.png", "meltagun": "meltagun.png", "mortar_sentry": "mortar_sentry.png", "one_true_flag": "one_true_flag.png", "orbital_120mm_he_barrage": "orbital_120mm_he_barrage.png", "orbital_380mm_he_barrage": "orbital_380mm_he_barrage.png", "orbital_airburst_strike": "orbital_airburst_strike.png", "orbital_ems_strike": "orbital_ems_strike.png", "orbital_gas_strike": "orbital_gas_strike.png", "orbital_gatling_barrage": "orbital_gatling_barrage.png", "orbital_illumination_flare": "orbital_illumination_flare.png", "orbital_laser": "orbital_laser.png", "orbital_napalm_barrage": "orbital_napalm_barrage.png", "orbital_precision_strike": "orbital_precision_strike.png", "orbital_railcannon_strike": "orbital_railcannon_strike.png", "orbital_smoke_strike": "orbital_smoke_strike.png", "orbital_walking_barrage": "orbital_walking_barrage.png", "patriot_exosuit": "patriot_exosuit.png", "portable_comms_relay": "cargo_container.png", "portable_hellbomb": "portable_hellbomb.png", "portable_hellbomb_mission": "portable_hellbomb_mission.png", "prospecting_drill": "drill.png", "quasar_cannon": "quasar_cannon.png", "railgun": "railgun.png", "recoilless_rifle": "recoilless_rifle.png", "reinforce": "reinforce.png", "resupply": "resupply.png", "rocket_sentry": "rocket_sentry.png", "rover": "rover.png", "seaf_artillery": "seaf_artillery.png", "seismic_probe": "seismic_probe.png", "shield_generator_pack": "shield_generator_pack.png", "shield_generator_relay": "shield_generator_relay.png", "solo_silo": "solo_silo.png", "sos_beacon": "sos_beacon.png", "spear": "spear.png", "speargun": "speargun.png", "sssd_delivery_long": "upload_data.png", "sssd_delivery_short": "upload_data.png", "stalwart": "stalwart.png", "sterilizer": "sterilizer.png", "super_earth_flag": "super_earth_flag.png", "supply_frv": "supply_frv.png", "supply_pack": "supply_pack.png", "tactical_video_camera": "tactical_video_camera.png", "tectonic_drill": "drill.png", "tesla_tower": "tesla_tower.png", "upload_data": "upload_data.png", "warp_pack": "warp_pack.png", "wasp_launcher": "wasp_launcher.png"};
+
+async function loadData() {
+    const list = STRATAGEMS;
+    const tree = TREE;
+    const icons = ICON_MAP;
+
+    Data.stratagems = list;
+    Data.roots = tree;
+    Data.byId = Object.fromEntries(list.map(s => [s.id, s]));
+    Data.iconOf = icons;
+    Data.pathOf = indexPaths(tree);
+
+    // An icon used by more than one stratagem makes those stratagems
+    // indistinguishable in the grid, so their folder gets name labels.
+    const usage = {};
+    for (const [id, file] of Object.entries(icons)) {
+        (usage[file] ||= []).push(id);
+    }
+    Data.sharedIcons = new Set(
+        Object.values(usage).filter(ids => ids.length > 1).flat()
+    );
+
+    return Data;
+}
+
+// --- icons -------------------------------------------------------------------
+
+function stratagemIcon(id) {
+    const file = Data.iconOf[id];
+    return file ? Paths.stratagems + file : null;
+}
+
+// Category icons follow <parent>_<node>.png, or <node>.png at the top level.
+// Whitespace is dropped, so "Team reload" -> backpack_teamreload.png.
+function categoryIcon(path) {
+    const slug = name => name.toLowerCase().replace(/\s+/g, "");
+    if (path.length === 1) return slug(path[0]) + ".png";
+    return slug(path[path.length - 2]) + "_" + slug(path[path.length - 1]) + ".png";
+}
+
+function categoryIconPath(path) {
+    // Vehicle has no icon of its own; it reuses the FRV one.
+    if (path.length === 2 && path[1] === "Vehicle") return "vehicle_frv.png";
+    return categoryIcon(path);
+}
+
+// --- tree --------------------------------------------------------------------
+
+// A few stratagems appear in two places; the first path wins.
+function indexPaths(roots) {
+    const pathOf = {};
+
+    function walk(nodes, path) {
+        for (const node of nodes) {
+            const here = [...path, node.name];
+            for (const id of node.stratagemIds || []) {
+                if (!(id in pathOf)) pathOf[id] = here;
+            }
+            if (node.subcategories) walk(node.subcategories, here);
+        }
+    }
+
+    walk(roots, []);
+    return pathOf;
+}
+
+// The current node is either the root (null) or a node with a `path` breadcrumb.
+function nodeSubcategories(node) {
+    return node ? node.subcategories || [] : Data.roots;
+}
+
+function nodeStratagems(node) {
+    return node ? node.stratagemIds || [] : [];
+}
+
+function nodeChildren(path) {
+    let nodes = Data.roots;
+    let node = null;
+    for (const name of path) {
+        node = (nodes || []).find(n => n.name === name);
+        if (!node) return null;
+        nodes = node.subcategories;
+    }
+    return node;
+}
+
+async function sleep(ms) {
+    return new Promise(res => setTimeout(res, ms));
+}
+
+async function playSfx(name) {
+    const path = Sfx[name];
+    if (!path) {
+        console.warn('Invalid sfx: ' + name);
+        return;
+    }
+    const sfx = new Audio(path);
+    sfx.volume = sfxVolume;
+    await sfx.play();
+}
+
+// Terse element builder: el("div", "tile", {title: "x"}, [child, ...])
+function el(tag, className, props, children) {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (props) Object.assign(node, props);
+    for (const child of children || []) {
+        if (child === null || child === undefined) continue;
+        node.appendChild(typeof child === "string" ? document.createTextNode(child) : child);
+    }
+    return node;
+}
+
+function randomItem(items) {
+    return items[Math.floor(Math.random() * items.length)];
+}
+
+// Fisher-Yates, in place.
+function shuffle(items) {
+    for (let i = items.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [items[i], items[j]] = [items[j], items[i]];
+    }
+    return items;
+}
+
+// Static configuration. Game data lives in assets/data/*.json and is loaded by data.js.
+
+const sfxVolume = 0.25;
+
+const Sfx = {
+    click: "assets/sfx/arrow complete.ogg",
+    correct: "assets/sfx/stratagem finish.ogg",
+    wrong: "assets/sfx/arrow fail.ogg"
+};
+
+const Paths = {
+    ui: "assets/icons/ui/",
+    stratagems: "assets/icons/stratagems/",
+    categories: "assets/icons/categories/"
+};
+
+const Sprites = {
+    arrows: {
+        w: Paths.ui + "w.png",
+        a: Paths.ui + "a.png",
+        s: Paths.ui + "s.png",
+        d: Paths.ui + "d.png"
+    }
+};
+
+// One stratagem at a time, endless: show its code, let the player navigate the
+// tree to find it, flash the tile, then deal the next one.
+
+const codeBoard = document.getElementById("code");
+const streakEl = document.getElementById("streak");
+const missesEl = document.getElementById("misses");
+const revealBtn = document.getElementById("reveal");
+
+let target = null;
+let streak = 0;
+let accepting = false;
+let misses = 0;
+
+// Reveal gives up the answer: pay the penalty, drop to the nearest common
+// ancestor of where the player is and where the answer lives, and outline the
+// next node of the route. Nothing is selected and nothing is flashed — the
+// outline is the only feedback, and it persists through every render so the
+// whole path can be traced by hand. The round then waits for the player to click
+// the target, and wrong clicks still cost a miss on top of the reveal.
+let revealed = false;
+
+// Draw without replacement: every enabled stratagem comes up once before any of
+// them can repeat. The bag refills (and reshuffles) once it runs dry, so a repeat
+// is still possible across the cycle boundary - just never back to back.
+let bag = [];
+
+function dealable() {
+    return Data.stratagems.filter(s => !s.disabled);
+}
+
+function refillBag() {
+    bag = shuffle(dealable().map(s => s.id));
+}
+
+function drawStratagem() {
+    if (bag.length === 0) refillBag();
+    return Data.byId[bag.shift()];
+}
+
+function renderCode(stratagem) {
+    codeBoard.replaceChildren();
+    for (const key of stratagem.code) {
+        codeBoard.appendChild(el("img", "", {src: Sprites.arrows[key], alt: key}));
+    }
+}
+
+function setStreak() {
+    streakEl.textContent = streak;
+}
+
+function setMisses() {
+    missesEl.textContent = misses;
+}
+
+async function nextStratagem() {
+    locked = true;
+    accepting = false;
+    misses = 0;
+    setMisses();
+    eliminated.clear();
+    deadFolders.clear();
+    revealed = false;
+    target = drawStratagem();
+    renderCode(target);
+    navigate([]);
+    locked = false;
+    accepting = true;
+}
+
+// A wrong click rules out exactly the stratagem that was clicked, and rewinds
+// to the deepest point where the player's branch was still correct — the
+// longest common prefix of where they are and where the answer is. Being on
+// the right branch already means no movement.
+function registerMiss(id) {
+    misses++;
+    setMisses();
+    eliminated.add(id);
+
+    const path = Data.pathOf[target.id] || [];
+    const shared = [];
+    for (let i = 0; i < Math.min(currentPath.length, path.length); i++) {
+        if (currentPath[i] !== path[i]) break;
+        shared.push(currentPath[i]);
+    }
+
+    if (shared.length !== currentPath.length) {
+        // Pushed out of a branch that cannot contain the answer. Everything
+        // from the leaf up to - but not including - where we land is dead.
+        for (let i = shared.length; i < currentPath.length; i++) {
+            deadFolders.add(pathKey(currentPath.slice(0, i + 1)));
+        }
+        navigate(shared);
+    } else {
+        applyEliminated();   // stay put, but the new dimming must show
+    }
+}
+
+// Reveal gives up the answer: pay the penalty, drop to the nearest common
+// ancestor of where the player is and where the answer lives, and outline the
+// next node of the route. Nothing is selected and nothing is flashed — the
+// outline is the only feedback, and it persists through every render so the
+// whole path can be traced by hand. The round then waits for the player to click
+// the target.
+async function revealSolution() {
+    if (!accepting) return;    accepting = false;
+    revealed = true;
+
+    streak = 0;
+    misses++;
+    setStreak();
+    setMisses();
+
+    const path = Data.pathOf[target.id] || [];
+    let shared = 0;
+    while (shared < currentPath.length && shared < path.length
+           && currentPath[shared] === path[shared]) {
+        shared++;
+    }
+    navigate(path.slice(0, shared));
+}
+
+revealBtn.addEventListener("click", () => {
+    if (!locked) revealSolution();
+});
+
+async function answer(id, tile) {
+    if (!accepting && !revealed) return;
+
+    if (id !== target.id) {
+        flash(tile, "failed", 400);
+        playSfx("wrong");
+        streak = 0;
+        setStreak();
+        registerMiss(id);
+        return;
+    }
+
+    accepting = false;
+    locked = true;
+    flash(tile, "correct", 500);
+    // The click sound is still ringing; let the completion land on top of it.
+    setTimeout(() => playSfx("correct"), 120);
+    // A revealed round was already given up — no streak credit for walking a
+    // path that was handed to you.
+    if (!revealed) {
+        streak++;
+        setStreak();
+    }
+
+    await sleep(600);
+    await nextStratagem();
+}
+
+// Tree navigation: renders the breadcrumb and the current folder's contents,
+// and handles activating tiles — by click, or by keyboard (WASD to move the
+// selection, Space to confirm).
+
+const screen = document.getElementById("screen");
+const breadcrumb = document.getElementById("breadcrumb");
+
+let currentPath = [];   // [] == root
+let locked = false;     // true while the correct answer animation plays
+let selectable = [];    // tiles in visual order, for keyboard movement
+let folderPaths = [];   // child paths, index-aligned with the folder tiles
+let selectedIndex = 0;
+let keyboardMode = false;   // outline only shows once WASD is used
+
+// Stratagem ids disproven this round. Clicking one only rules out that one —
+// a folder is never disproven, so the player stays put and keeps every option.
+let eliminated = new Set();
+
+// Folders the player was pushed out of after guessing a wrong branch. Only
+// populated when a rewind actually happens, so wandering off by accident does
+// not rule out a section you merely dipped into.
+let deadFolders = new Set();
+
+const pathKey = path => path.join(">");
+
+// --- rendering ---------------------------------------------------------------
+
+function renderBreadcrumb() {
+    breadcrumb.replaceChildren();
+
+    const rootCrumb = el("span", "crumb root", {textContent: "Stratagem Legend"});
+    rootCrumb.addEventListener("click", () => navigate([]));
+    breadcrumb.appendChild(rootCrumb);
+
+    let acc = [];
+    for (const name of currentPath) {
+        acc = [...acc, name];
+        const target = [...acc];
+        const sep = el("span", "sep", {textContent: "›"});
+        const crumb = el("span", "crumb", {textContent: name});
+        crumb.addEventListener("click", () => navigate(target));
+        breadcrumb.append(sep, crumb);
+    }
+}
+
+// Every icon acknowledges the click with the arrow-complete sound. Correct
+// stratagems add the completion sound on top (from answer()), so the two
+// layer rather than replace each other.
+function addTile(tile, onActivate, into) {
+    tile.addEventListener("click", () => {
+        if (locked) return;
+        playSfx("click");
+        onActivate();
+    });
+    into.appendChild(tile);
+    selectable.push(tile);
+}
+
+// The screen is a two-column, two-row grid:
+//
+//     a b      a = Back, alone in the left column
+//     a c      b = category tiles    c = stratagem tiles
+//
+// The dashed rule between b and c comes from the row gap on .grid-strats.
+function renderScreen() {
+    const node = nodeChildren(currentPath);
+    screen.replaceChildren();
+    selectable = [];
+    folderPaths = [];
+
+    const back = el("div", "grid-back");
+    const cats = el("div", "grid-cats");
+    const stratagems = el("div", "grid-strats");
+    screen.append(back, cats, stratagems);
+
+    const subcategories = nodeSubcategories(node);
+    const stratagemIds = nodeStratagems(node);
+
+    // "cd .." — one level up. At the root there is nowhere to go, so the tile
+    // is drawn dead (see .tile.nav.off) and does nothing.
+    const up = [...currentPath.slice(0, -1)];
+    const backTile = el("div", "tile nav", {title: "Back"}, [
+        el("img", "", {src: Paths.ui + "back.png", alt: "Back"}),
+        el("span", "label", {textContent: "Back"})
+    ]);
+    if (currentPath.length) {
+        addTile(backTile, () => navigate(up), back);
+    } else {
+        backTile.classList.add("off");
+        back.appendChild(backTile);
+    }
+
+    for (const sub of subcategories) {
+        const childPath = [...currentPath, sub.name];
+        folderPaths.push(childPath);
+        addTile(el("div", "tile folder", {title: sub.name}, [
+            el("img", "", {src: Paths.categories + categoryIconPath(childPath), alt: ""}),
+            el("span", "label", {textContent: sub.name})
+        ]), () => navigate(childPath), cats);
+    }
+    if (subcategories.length) stratagems.classList.add("ruled");
+
+    for (const id of stratagemIds) {
+        const stratagem = Data.byId[id];
+        const label = (stratagem.prefix ? stratagem.prefix + " " : "") + stratagem.name;
+        const tile = el("div", "tile stratagem", {title: stratagem.name}, [
+            el("img", "", {src: stratagemIcon(id), alt: ""}),
+            el("span", "label", {textContent: label})
+        ]);
+        tile.dataset.id = id;
+        addTile(tile, () => answer(id, tile), stratagems);
+    }
+
+    // Remember where WASD movement starts from — the first real tile, never the
+    // Back row. The outline stays hidden until a key is actually pressed.
+    selectedIndex = Math.max(0, selectable.findIndex(t => !t.classList.contains("nav")));
+    applyEliminated();
+    applyTrace();
+    paintSelection();
+}
+
+// A dead folder takes its whole subtree with it.
+function isDeadFolder(path) {
+    const key = pathKey(path);
+    for (const dead of deadFolders) {
+        if (key === dead || key.startsWith(dead + ">")) return true;
+    }
+    return false;
+}
+
+// Apply the dimming to whatever is on screen. Called after every render AND
+// after a miss that did not navigate, so the state never drifts from the sets.
+function applyEliminated() {
+    screen.querySelectorAll(".tile.stratagem").forEach(tile => {
+        tile.classList.toggle("eliminated", eliminated.has(tile.dataset.id));
+    });
+    screen.querySelectorAll(".tile.folder").forEach((tile, i) => {
+        tile.classList.toggle("eliminated", isDeadFolder(folderPaths[i]));
+    });
+}
+
+function navigate(path) {
+    currentPath = path;
+    renderBreadcrumb();
+    renderScreen();
+}
+
+// After a Reveal, the next node on the route to the answer is outlined in white.
+// It follows the player down: each render outlines the child they should enter
+// next, until the view holds the answer itself. Nothing off the route — and
+// nothing at all once the player wanders off it — is marked.
+function applyTrace() {
+    if (!revealed || !target) return;
+
+    const path = Data.pathOf[target.id] || [];
+    // Only while the player is on the route, or still above it.
+    if (currentPath.length > path.length) return;
+    if (currentPath.some((name, i) => name !== path[i])) return;
+
+    let tile = null;
+    if (currentPath.length === path.length) {
+        tile = screen.querySelector(`.tile.stratagem[data-id="${target.id}"]`);
+    } else {
+        // folderPaths is index-aligned with the folder tiles, and each entry is
+        // the current path plus one name, so only the last one has to match.
+        const next = path[currentPath.length];
+        const index = folderPaths.findIndex(
+            p => p.length === currentPath.length + 1 && p[p.length - 1] === next
+        );
+        if (index >= 0) tile = screen.querySelectorAll(".tile.folder")[index];
+    }
+
+    if (tile) tile.classList.add("traced");
+}
+
+function flash(tile, className, ms) {
+    tile.classList.add(className);
+    setTimeout(() => tile.classList.remove(className), ms);
+}
+
+// --- keyboard ----------------------------------------------------------------
+
+function paintSelection() {
+    selectable.forEach((tile, i) => {
+        tile.classList.toggle("selected", keyboardMode && i === selectedIndex);
+    });
+}
+
+function select(index) {
+    const tile = selectable[index];
+    if (!tile) return;
+    selectedIndex = index;
+    paintSelection();
+    tile.scrollIntoView({block: "nearest"});
+}
+
+// Tiles sharing an offsetTop are on the same visual row.
+function rowTiles(top) {
+    return selectable
+        .filter(tile => tile.offsetTop === top)
+        .sort((a, b) => a.offsetLeft - b.offsetLeft);
+}
+
+function rowTops() {
+    return [...new Set(selectable.map(tile => tile.offsetTop))].sort((a, b) => a - b);
+}
+
+// Move to the closest tile in a direction, using real geometry so that wrapped
+// rows and the Back tile are handled correctly. Horizontal movement wraps: past
+// the right edge drops to the next row, past the left edge climbs to the
+// previous one.
+function moveSelection(dx, dy) {
+    if (!selectable.length) return;
+    const from = selectable[selectedIndex];
+
+    if (dy !== 0) {
+        const fTop = from.offsetTop;
+        const fLeft = from.offsetLeft;
+        let best = -1;
+        let bestScore = Infinity;
+        selectable.forEach((tile, i) => {
+            if (i === selectedIndex) return;
+            const dTop = tile.offsetTop - fTop;
+            const dLeft = tile.offsetLeft - fLeft;
+            const along = dTop * dy;
+            if (along <= 0) return;
+            const score = along + Math.abs(dLeft) * 2;
+            if (score < bestScore) {
+                bestScore = score;
+                best = i;
+            }
+        });
+        if (best >= 0) select(best);
+        return;
+    }
+
+    const row = rowTiles(from.offsetTop);
+    const neighbour = row[row.indexOf(from) + dx];
+    if (neighbour) {
+        select(selectable.indexOf(neighbour));
+        return;
+    }
+
+    // At the edge of the row — wrap to the adjacent one.
+    const tops = rowTops();
+    const nextTop = tops[tops.indexOf(from.offsetTop) + dx];
+    if (nextTop === undefined) return;
+    const nextRow = rowTiles(nextTop);
+    if (!nextRow.length) return;
+    select(selectable.indexOf(dx > 0 ? nextRow[0] : nextRow[nextRow.length - 1]));
+}
+
+document.addEventListener("keydown", event => {
+    if (locked || event.ctrlKey || event.metaKey || event.altKey) return;
+
+    // Only when nothing is focused, so form fields keep their own keys.
+    const active = document.activeElement;
+    if (active && active !== document.body) return;
+
+    switch (event.key) {
+        case "w": case "W": keyboardMode = true; moveSelection(0, -1); break;
+        case "s": case "S": keyboardMode = true; moveSelection(0, 1); break;
+        case "a": case "A": keyboardMode = true; moveSelection(-1, 0); break;
+        case "d": case "D": keyboardMode = true; moveSelection(1, 0); break;
+        case " ":
+            event.preventDefault();               // don't scroll the page
+            selectable[selectedIndex]?.click();
+            break;
+        default: return;
+    }
+});
+
+// Moving the mouse hands control back — the keyboard outline disappears.
+document.addEventListener("mousemove", () => {
+    if (!keyboardMode) return;
+    keyboardMode = false;
+    paintSelection();
+});
+
+async function start() {
+    await loadData();
+    setStreak();
+    await nextStratagem();
+}
+
+start();
+</script>
+</body>
+</html>

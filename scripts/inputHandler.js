@@ -92,17 +92,20 @@ function mark(elm, cls, on) {
     if (elm.icon) elm.icon.classList.toggle(cls, on);
 }
 
-// Dim what is ruled out: stratagems clicked wrong, and every folder the player
+// Dim what is ruled out: stratagems clicked wrong, every folder the player
 // was pushed out of - with everything inside it, subfolders and stratagems
-// alike. Still clickable. Called after every render AND after a miss that did
+// alike - and everything outside the folder the answer is known to be in
+// (outsideKnown, stratagemHandler.js). Still clickable. Called after every render AND after a miss that did
 // not navigate, so the state never drifts from the sets.
 function applyEliminated() {
     if (!drawn) return;
     for (const cell of drawn.stratagems) {
-        mark(cell, "eliminated", eliminated.has(cell.info.id) || isDeadFolder(cell.info.path));
+        mark(cell, "eliminated", eliminated.has(cell.info.id) || isDeadFolder(cell.info.path)
+            || outsideKnown(cell.info.path, cell.info.id));
     }
     for (const [key, elms] of drawn.folders) {
-        const dead = isDeadFolder(key.split(">"));
+        const path = key.split(">");
+        const dead = isDeadFolder(path) || outsideKnown(path);
         for (const elm of elms) mark(elm, "eliminated", dead);
     }
 }

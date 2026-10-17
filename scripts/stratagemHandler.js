@@ -24,6 +24,11 @@ let revealed = false;
 // is still possible across the cycle boundary - just never back to back.
 let bag = [];
 
+// Where the answer must be, as far as the misses have told: the deepest folder
+// known to hold it ([] = nothing known yet). Everything outside it is greyed.
+let knownFolder = [];
+let places = [];            // every folder path the target is filed under
+
 function dealable() {
     return Data.stratagems.filter(s => !s.disabled);
 }
@@ -59,37 +64,93 @@ async function nextStratagem() {
     setMisses();
     eliminated.clear();
     deadFolders.clear();
+    knownFolder = [];
     revealed = false;
     target = drawStratagem();
+    places = targetPaths();
     renderCode(target);
     navigate([]);
     locked = false;
     accepting = true;
 }
 
-// A wrong click rules out exactly the stratagem that was clicked, and rewinds
-// to the deepest point where the player's branch was still correct — the
-// longest common prefix of where they are and where the answer is. Being on
-// the right branch already means no movement.
-function registerMiss(id) {
+// Every folder path the target is filed under - a few stratagems sit in two.
+function targetPaths() {
+    const paths = [];
+    (function walk(nodes, path) {
+        for (const node of nodes) {
+            const here = [...path, node.name];
+            if ((node.stratagemIds || []).includes(target.id)) paths.push(here);
+            if (node.subcategories) walk(node.subcategories, here);
+        }
+    })(Data.roots, []);
+    return paths;
+}
+
+// `path` is the folder `folder` or inside it.
+const inside = (path, folder) => folder.every((name, i) => path[i] === name);
+
+// Does the folder at `path` (or anything inside it) hold the answer?
+function holdsTarget(path) {
+    return places.some(p => inside(p, path));
+}
+
+// The deepest folder along `path` that still holds the answer.
+function deepestHolding(path) {
+    let n = path.length;
+    while (n > 0 && !holdsTarget(path.slice(0, n))) n--;
+    return path.slice(0, n);
+}
+
+// Ruled out because the answer is known to be elsewhere: outside the known
+// folder - unless it holds the answer itself (a stratagem filed in two places
+// keeps both; the folders above the known one hold it anyway). A stratagem
+// cell sits at its folder's path; `id` tells it from a folder.
+function outsideKnown(path, id) {
+    if (!knownFolder.length || !target) return false;
+    if (inside(path, knownFolder)) return false;
+    return id ? id !== target.id : !holdsTarget(path);
+}
+
+// Grey out a branch the answer is not in: the outermost folder along `path`
+// that does not hold it - its whole subtree goes with it. From the root that
+// is the very category the player went into, unless the answer is in there too;
+// then the subfolder one level down, and so on.
+function killBranch(path) {
+    for (let n = 1; n <= path.length; n++) {
+        if (!holdsTarget(path.slice(0, n))) {
+            deadFolders.add(pathKey(path.slice(0, n)));
+            return;
+        }
+    }
+}
+
+// A wrong click rules out the stratagem, greys out the branch it was picked
+// from - on the wheel that can be deep inside, straight from the root - and the
+// branch the player had opened, and rewinds to the deepest folder of theirs
+// that still holds the answer. Being on the right branch already means no
+// movement.
+//
+// The miss also tells where the answer must be: in that folder the rewind
+// lands on, and in the deepest folder the wrong pick shares with the answer.
+// The deepest of those (and of what earlier misses told) becomes the known
+// folder; everything outside it is greyed too.
+function registerMiss(id, cell) {
     misses++;
     setMisses();
     eliminated.add(id);
 
-    const path = Data.pathOf[target.id] || [];
-    const shared = [];
-    for (let i = 0; i < Math.min(currentPath.length, path.length); i++) {
-        if (currentPath[i] !== path[i]) break;
-        shared.push(currentPath[i]);
+    if (cell && cell.info) killBranch(cell.info.path);
+    killBranch(currentPath);
+
+    const back = deepestHolding(currentPath);
+    const told = [back, cell && cell.info ? deepestHolding(cell.info.path) : []];
+    for (const folder of told) {
+        if (folder.length > knownFolder.length) knownFolder = folder;
     }
 
-    if (shared.length !== currentPath.length) {
-        // Pushed out of a branch that cannot contain the answer. Everything
-        // from the leaf up to - but not including - where we land is dead.
-        for (let i = shared.length; i < currentPath.length; i++) {
-            deadFolders.add(pathKey(currentPath.slice(0, i + 1)));
-        }
-        navigate(shared);
+    if (back.length !== currentPath.length) {
+        navigate(back);
     } else {
         applyEliminated();   // stay put, but the new dimming must show
     }
@@ -131,7 +192,7 @@ async function answer(id, tile) {
         playSfx("wrong");
         streak = 0;
         setStreak();
-        registerMiss(id);
+        registerMiss(id, tile);
         return;
     }
 

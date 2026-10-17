@@ -26,7 +26,7 @@ button {
     font: inherit;
 }
 
-/* Buttons to the other pages (game / viewer), pinned top-left on
+/* Buttons to the other pages (game / viewer / gambling), pinned top-left on
    every page. Styled after the arcade's Reveal button; no keyboard shortcut. */
 #pages {
     position: fixed;

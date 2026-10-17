@@ -110,11 +110,28 @@ function applyEliminated() {
     }
 }
 
+// Only a real change of folder rebuilds the wheel (and replays its grow-in
+// animation, and resets zoom and pan). Staying where it is - a Reveal or a
+// miss that needs no rewind, a new round already at the root - keeps the
+// wheel as it is and only redraws the round's marks: no flash.
 function navigate(path) {
+    const same = drawn && pathKey(path) === pathKey(currentPath);
     currentPath = path;
     tips.hide();
+    if (same) {
+        refreshMarks();
+        return;
+    }
     renderBreadcrumb();
     renderScreen();
+}
+
+// The round's marks on the wheel as drawn: greyed out, and the Reveal outline
+// (cleared first - a new round starts without it).
+function refreshMarks() {
+    for (const cell of drawn.cells.querySelectorAll(".traced")) cell.classList.remove("traced");
+    applyEliminated();
+    applyTrace();
 }
 
 // After a Reveal the whole route below the current folder is outlined in

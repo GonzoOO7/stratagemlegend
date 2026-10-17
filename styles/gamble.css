@@ -198,7 +198,11 @@
     color: #7d8fb5;
 }
 
-#options {
+#options-panel h2:not(:first-child) {
+    margin-top: 1.5rem;
+}
+
+#limits {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
     gap: 1rem;
@@ -238,14 +242,15 @@
     color: #7d8fb5;
 }
 
-/* The real checkbox stays for keyboard and screen readers, drawn as a switch. */
-.toggle input {
+/* The real checkbox stays for keyboard and screen readers, drawn as a switch.
+   .toggle is a whole card; .sw is the bare switch on a tree row. */
+:is(.toggle, .sw) input {
     position: absolute;
     opacity: 0;
     pointer-events: none;
 }
 
-.toggle .switch {
+:is(.toggle, .sw) .switch {
     position: relative;
     flex: none;
     width: 2.2rem;
@@ -255,7 +260,7 @@
     transition: background .15s;
 }
 
-.toggle .switch::after {
+:is(.toggle, .sw) .switch::after {
     content: "";
     position: absolute;
     top: .15rem;
@@ -267,24 +272,272 @@
     transition: transform .15s, background .15s;
 }
 
-.toggle input:checked + .switch {
-    background: #d47a6a;
+:is(.toggle, .sw) input:checked + .switch {
+    background: #e8c860;
 }
 
-.toggle input:checked + .switch::after {
+:is(.toggle, .sw) input:checked + .switch::after {
     transform: translateX(1rem);
     background: #fff;
 }
 
-.toggle input:focus-visible + .switch {
+:is(.toggle, .sw) input:focus-visible + .switch {
     outline: 2px solid #e8c860;
     outline-offset: 2px;
 }
 
-/* Excluded categories fade out, like ruled-out tiles in the game. */
-.toggle:has(input:checked) img,
-.toggle:has(input:checked) .name,
-.toggle:has(input:checked) .count {
+/* Switched off (a category left out, a rule not applied) fades out, like
+   ruled-out cells in the game. */
+.toggle:not(.half):has(input:not(:checked)) img,
+.toggle:not(.half):has(input:not(:checked)) .name,
+.toggle:not(.half):has(input:not(:checked)) .count {
+    opacity: .35;
+    filter: grayscale(1);
+}
+
+/* Backpack, support weapon and "always allow expendables": three wide cards,
+   so the mode buttons have room. */
+#limits {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+/* A limit (backpack, support weapon): its modes as a row of buttons. */
+.toggle.limit {
+    flex-wrap: wrap;
+    cursor: default;
+}
+
+.toggle.limit .modes {
+    display: flex;
+    width: 100%;
+    gap: .3rem;
+}
+
+.toggle.limit .modes button {
+    flex: 1;
+    padding: .25rem .2rem;
+    white-space: nowrap;
+    font-family: HD, sans-serif;
+    font-size: .7rem;
+    text-transform: uppercase;
+    color: #8fa0c0;
+    background: #2b3a5e;
+    border: 1px solid transparent;
+    border-radius: .2rem;
+    cursor: pointer;
+}
+
+.toggle.limit .modes button:hover {
+    border-color: #e8c860;
+}
+
+.toggle.limit .modes button.on {
+    color: #113;
+    background: #e8c860;
+}
+
+/* "none" picked: the group is out, so grey rather than lit */
+.toggle.limit.off .modes button.on {
+    color: #113;
+    background: #8fa0c0;
+}
+
+.toggle.limit.off img,
+.toggle.limit.off .name,
+.toggle.limit.off .count {
+    opacity: .35;
+    filter: grayscale(1);
+}
+
+/* --- the pool tree: categories (elements, types) first, then one column per
+   top-level category --------------------------------------------------------- */
+
+/* Support has the deepest tree, so it gets the widest column. */
+#types {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.4fr 1fr;
+    gap: 1rem;
+    align-items: start;
+}
+
+.type-col {
+    display: flex;
+    flex-direction: column;
+    gap: .4rem;
+    min-width: 0;
+}
+
+.type-col h3 {
+    padding-bottom: .3rem;
+    font-family: HD, sans-serif;
+    font-size: .75rem;
+    font-weight: normal;
+    text-transform: uppercase;
+    border-bottom: 2px solid currentColor;
+}
+
+/* the categories' colours, as on the wheel; the categories column in Mission's yellow */
+.type-col.offensive { --col: #d0574a; }
+.type-col.support   { --col: #4a90c8; }
+.type-col.defensive { --col: #4fa34f; }
+.type-col.elements  { --col: #e8c860; }
+
+.type-col h3 {
+    color: var(--col);
+}
+
+.type-col.elements .toggle {
+    gap: .5rem;
+    padding: .3rem .5rem;
+    font-size: .8rem;
+}
+
+.type-col.elements .toggle .name {
+    min-width: 0;
+}
+
+/* the groups' cards sit in the group's .kids like tree rows; no border line,
+   the cards are boxes already */
+.type-col.elements .kids {
+    gap: .3rem;
+    margin-left: .6rem;
+    padding-left: 0;
+    border-left: none;
+}
+
+.type-col.elements .toggle img {
+    width: 38px; /* 19px art, 2x */
+    height: 38px;
+}
+
+/* a row: caret, icon, name, count (folders), switch */
+.trow {
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .15rem .4rem .15rem .2rem;
+    font-family: HD, sans-serif;
+    font-size: .72rem;
+    line-height: 1.15;
+    text-transform: uppercase;
+    color: #fff;
+    border: 1px solid transparent;
+    border-radius: .2rem;
+    user-select: none;
+}
+
+.trow img {
+    flex: none;
+    width: 38px; /* 19px art, 2x */
+    height: 38px;
+}
+
+.trow .name {
+    flex: 1;
+    min-width: 0;
+    hyphens: auto;          /* "Emplacement" in a narrow column: break, don't overlap */
+    overflow-wrap: anywhere;
+}
+
+.trow .count {
+    font-size: .7rem;
+    color: #7d8fb5;
+    white-space: nowrap;
+}
+
+.trow .sw {
+    position: relative;
+    display: flex;      /* the switch is a span: a flex item gets its size */
+    flex: none;
+    cursor: pointer;
+}
+
+.trow.folder {
+    background: #1b2a4d;
+    border-color: #3a4a6b;
+    cursor: pointer;
+}
+
+.trow.folder:hover {
+    border-color: #e8c860;
+}
+
+.trow .caret {
+    flex: none;
+    width: .7rem;
+    color: #7d8fb5;
+    text-align: center;
+}
+
+.trow.folder .caret::before {
+    content: "\25B8";      /* ▸ */
+}
+
+.tnode.open > .trow.folder .caret::before {
+    content: "\25BE";      /* ▾ */
+}
+
+/* the category itself: the column's heading, always open */
+.trow.head {
+    padding: 0 0 .3rem;
+    font-size: .85rem;
+    color: var(--col);
+    background: none;
+    border: none;
+    border-bottom: 2px solid var(--col);
+    border-radius: 0;
+    cursor: default;
+}
+
+.trow.head .caret {
+    display: none;
+}
+
+.tnode > .kids {
+    display: none;
+    flex-direction: column;
+    gap: .15rem;
+    margin: .15rem 0 0 .45rem;
+    padding-left: .35rem;
+    border-left: 1px solid #2b3a5e;
+}
+
+.tnode.open > .kids {
+    display: flex;
+}
+
+.tree-col > .tnode > .kids {
+    margin-left: 0;
+    padding-left: 0;
+    border-left: none;
+}
+
+/* off by its own switch, out for another reason, or never dealt: greyed */
+.trow:not(.half):has(> .sw input:not(:checked)) > :is(img, .name, .count),
+.trow.implied > :is(img, .name, .count, .sw),
+.trow.fixed > :is(img, .name, .sw) {
+    opacity: .35;
+    filter: grayscale(1);
+}
+
+.trow.fixed .sw {
+    cursor: not-allowed;
+}
+
+/* half: some of a category's stratagems are switched on in the tree, some
+   off - the knob sits in the middle */
+.half .switch {
+    background: #6b5d2e;
+}
+
+.half .switch::after {
+    transform: translateX(.5rem);
+    background: #e8c860;
+}
+
+/* a category card with none of its stratagems left in the pool (a folder is
+   off, ...) although its switch is on: greyed */
+.toggle.implied :is(img, .name, .count, .switch) {
     opacity: .35;
     filter: grayscale(1);
 }

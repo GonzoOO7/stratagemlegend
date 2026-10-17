@@ -1,0 +1,319 @@
+{
+  "never": ["Mission"],
+  "unavailable": [
+    "incinerator_frv"
+  ],
+  "rules": [
+    {
+      "id": "backpack",
+      "name": "Backpack",
+      "hint": "Stratagems that take the backpack slot: backpacks, and weapons that come with one",
+      "icon": "equipment_backpack.png",
+      "default": "any",
+      "ids": [
+        "supply_pack",
+        "portable_hellbomb",
+        "c4_pack",
+        "jump_pack",
+        "hover_pack",
+        "warp_pack",
+        "ballistic_shield_backpack",
+        "shield_generator_pack",
+        "directional_shield",
+        "guard_dog",
+        "rover",
+        "dog_breath",
+        "k_9",
+        "hot_dog",
+        "airburst_rocket_launcher",
+        "autocannon",
+        "recoilless_rifle",
+        "spear",
+        "wasp_launcher",
+        "maxigun",
+        "belt_fed_grenade_launcher",
+        "cremator"
+      ]
+    },
+    {
+      "id": "support_weapon",
+      "name": "Support weapon",
+      "hint": "Support weapons: handheld, melee, expendable and backpack weapons",
+      "icon": "equipment_weapon.png",
+      "default": "any",
+      "ids": [
+        "anti_materiel_rifle",
+        "railgun",
+        "grenade_launcher",
+        "stalwart",
+        "machine_gun",
+        "heavy_machine_gun",
+        "laser_cannon",
+        "quasar_cannon",
+        "flamethrower",
+        "arc_thrower",
+        "de_escalator",
+        "epoch",
+        "sterilizer",
+        "speargun",
+        "meltagun",
+        "defoliation_tool",
+        "breaching_hammer",
+        "one_true_flag",
+        "expendable_anti_tank",
+        "expendable_napalm",
+        "leveller",
+        "commando",
+        "solo_silo",
+        "bullet_storm",
+        "airburst_rocket_launcher",
+        "autocannon",
+        "recoilless_rifle",
+        "spear",
+        "wasp_launcher",
+        "c4_pack",
+        "maxigun",
+        "belt_fed_grenade_launcher",
+        "cremator"
+      ]
+    }
+  ],
+  "exempt": [
+    {
+      "id": "free_expendables",
+      "name": "Always allow expendables",
+      "hint": "Expendable weapons and the Portable Hellbomb are used up and dropped, so the backpack / support weapon limits don't apply to them",
+      "icon": "handheld_expendable.png",
+      "default": false,
+      "ids": [
+        "expendable_anti_tank",
+        "expendable_napalm",
+        "leveller",
+        "commando",
+        "solo_silo",
+        "bullet_storm",
+        "portable_hellbomb"
+      ]
+    }
+  ],
+  "groups": {
+    "Elements": {"icon": "elements.png"}
+  },
+  "categories": [
+    {
+      "id": "no_fire",
+      "group": "Elements",
+      "name": "Fire",
+      "hint": "Include napalm, flame and incendiary stratagems",
+      "icon": "element_fire.png",
+      "default": false,
+      "ids": [
+        "orbital_napalm_barrage",
+        "eagle_napalm_airstrike",
+        "flamethrower",
+        "expendable_napalm",
+        "cremator",
+        "hot_dog",
+        "flame_sentry",
+        "incendiary_mines",
+        "incinerator_frv",
+        "meltagun",
+        "lumberer_exosuit"
+      ]
+    },
+    {
+      "id": "no_gas",
+      "group": "Elements",
+      "name": "Gas",
+      "hint": "Include gas stratagems",
+      "icon": "element_gas.png",
+      "default": false,
+      "ids": [
+        "orbital_gas_strike",
+        "eagle_gas_airstrike",
+        "sterilizer",
+        "dog_breath",
+        "gas_mortar_sentry",
+        "gas_mines",
+        "speargun"
+      ]
+    },
+    {
+      "id": "no_arc",
+      "group": "Elements",
+      "name": "Arc",
+      "hint": "Include arc (lightning) stratagems",
+      "icon": "element_arc.png",
+      "default": false,
+      "ids": [
+        "arc_thrower",
+        "tesla_tower",
+        "k_9",
+        "de_escalator"
+      ]
+    },
+    {
+      "id": "no_ems",
+      "group": "Elements",
+      "name": "EMS",
+      "hint": "Include EMS (stun) stratagems",
+      "icon": "element_ems.png",
+      "default": false,
+      "ids": [
+        "orbital_ems_strike",
+        "ems_mortar_sentry"
+      ]
+    },
+    {
+      "id": "no_smoke",
+      "group": "Elements",
+      "name": "Smoke",
+      "hint": "Include the smoke strikes",
+      "icon": "element_smoke.png",
+      "default": false,
+      "ids": [
+        "orbital_smoke_strike",
+        "eagle_smoke_strike"
+      ]
+    },
+    {
+      "id": "no_laser",
+      "group": "Elements",
+      "name": "Lasers",
+      "hint": "Include laser stratagems",
+      "icon": "element_lasers.png",
+      "default": false,
+      "ids": [
+        "orbital_laser",
+        "laser_cannon",
+        "quasar_cannon",
+        "laser_sentry",
+        "rover"
+      ]
+    },
+    {
+      "id": "no_bullets",
+      "group": "Types",
+      "name": "Bullets",
+      "hint": "Include bullet stratagems: machine guns, rifles, strafing runs, gun sentries",
+      "icon": "element_bullets.png",
+      "default": false,
+      "ids": [
+        "eagle_strafing_run",
+        "machine_gun",
+        "stalwart",
+        "heavy_machine_gun",
+        "anti_materiel_rifle",
+        "railgun",
+        "maxigun",
+        "bullet_storm",
+        "machine_gun_sentry",
+        "gatling_sentry",
+        "hmg_emplacement",
+        "guard_dog",
+        "gunner_frv",
+        "patriot_exosuit",
+        "breakthrough_exosuit",
+        "maelstrom"
+      ]
+    },
+    {
+      "id": "no_explosives",
+      "group": "Types",
+      "name": "Explosives",
+      "hint": "Include explosive stratagems: shells, bombs, rockets, grenades, mines",
+      "icon": "element_explosives.png",
+      "default": false,
+      "ids": [
+        "orbital_precision_strike",
+        "orbital_gatling_barrage",
+        "orbital_120mm_he_barrage",
+        "orbital_380mm_he_barrage",
+        "orbital_walking_barrage",
+        "orbital_airburst_strike",
+        "orbital_railcannon_strike",
+        "eagle_airstrike",
+        "eagle_cluster_bomb",
+        "eagle_500kg_bomb",
+        "eagle_110mm_rocket_pods",
+        "expendable_anti_tank",
+        "recoilless_rifle",
+        "grenade_launcher",
+        "autocannon",
+        "airburst_rocket_launcher",
+        "commando",
+        "spear",
+        "wasp_launcher",
+        "belt_fed_grenade_launcher",
+        "solo_silo",
+        "c4_pack",
+        "portable_hellbomb",
+        "mortar_sentry",
+        "rocket_sentry",
+        "autocannon_sentry",
+        "anti_personnel_minefield",
+        "anti_tank_mines",
+        "anti_tank_emplacement",
+        "grenadier_battlement",
+        "emancipator_exosuit",
+        "patriot_exosuit",
+        "bastion_mk_xvi",
+        "leveller",
+        "epoch"
+      ]
+    },
+    {
+      "id": "no_shield",
+      "group": "Types",
+      "name": "Shield",
+      "hint": "Include shields: the shield backpacks and the shield emplacements",
+      "icon": "element_shield.png",
+      "default": false,
+      "ids": [
+        "ballistic_shield_backpack",
+        "shield_generator_pack",
+        "directional_shield",
+        "shield_generator_relay",
+        "grenadier_battlement"
+      ]
+    },
+    {
+      "id": "no_supply",
+      "group": "Types",
+      "name": "Supply",
+      "hint": "Include supply stratagems: the Supply Pack and the Supply FRV",
+      "icon": "element_supply.png",
+      "default": false,
+      "ids": [
+        "supply_pack",
+        "supply_frv"
+      ]
+    },
+    {
+      "id": "no_melee",
+      "group": "Types",
+      "name": "Melee",
+      "hint": "Include the melee weapons",
+      "icon": "element_melee.png",
+      "default": false,
+      "ids": [
+        "defoliation_tool",
+        "breaching_hammer",
+        "one_true_flag"
+      ]
+    },
+    {
+      "id": "no_movement",
+      "group": "Types",
+      "name": "Movement",
+      "hint": "Include the movement packs",
+      "icon": "element_movement.png",
+      "default": false,
+      "ids": [
+        "jump_pack",
+        "hover_pack",
+        "warp_pack"
+      ]
+    }
+  ]
+}

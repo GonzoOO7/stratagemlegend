@@ -124,9 +124,14 @@
     width: 6rem;
 }
 
-/* No way back from the root, so the column goes away. */
-.grid-back.empty {
-    display: none;
+/* Back at the root: there is nowhere to go, so it sits there dead. */
+.tile.nav.off {
+    cursor: default;
+    opacity: .25;
+}
+
+.tile.nav.off:hover {
+    transform: none;
 }
 
 .grid-cats {

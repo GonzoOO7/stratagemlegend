@@ -76,15 +76,18 @@ function renderScreen() {
     const subcategories = nodeSubcategories(node);
     const stratagemIds = nodeStratagems(node);
 
-    // "cd .." — one level up, only once there is somewhere to go.
+    // "cd .." — one level up. At the root there is nowhere to go, so the tile
+    // is drawn dead (see .tile.nav.off) and does nothing.
+    const up = [...currentPath.slice(0, -1)];
+    const backTile = el("div", "tile nav", {title: "Back"}, [
+        el("img", "", {src: Paths.ui + "back.png", alt: "Back"}),
+        el("span", "label", {textContent: "Back"})
+    ]);
     if (currentPath.length) {
-        const up = [...currentPath.slice(0, -1)];
-        addTile(el("div", "tile nav", {title: "Back"}, [
-            el("img", "", {src: Paths.ui + "back.png", alt: "Back"}),
-            el("span", "label", {textContent: "Back"})
-        ]), () => navigate(up), back);
+        addTile(backTile, () => navigate(up), back);
     } else {
-        back.classList.add("empty");
+        backTile.classList.add("off");
+        back.appendChild(backTile);
     }
 
     for (const sub of subcategories) {

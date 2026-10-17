@@ -14,7 +14,7 @@ body {
     display: grid;
     justify-items: center;
     align-content: center;
-    padding: 2rem;
+    padding: 5rem 2rem 2rem;    /* top: clear of the page buttons */
     box-sizing: border-box;
 }
 
@@ -58,7 +58,15 @@ button {
     height: 38px;
 }
 
-.page-btn:hover {
+a.page-btn:hover {
     color: #fff;
     border-color: #e8c860;
+}
+
+/* The page you are on: still drawn, so the row looks the same everywhere,
+   but greyed out and not clickable. */
+.page-btn.current {
+    opacity: .35;
+    filter: grayscale(1);
+    cursor: default;
 }

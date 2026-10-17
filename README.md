@@ -16,7 +16,8 @@ step, no dependencies.
 - **Gambling** (`gamble.html`): spin 1–16 random stratagems. Choose what is in
   the pool (the whole stratagem tree, down to single stratagems, plus elements
   and types like fire or explosives) and set limits such as "exactly one
-  backpack".
+  backpack" - never two vehicles of the same kind, though. Let's go gambling!
+  ...aw dang it. (Sound on: the page greets you with the meme - see Credits.)
 
 ## Run locally
 
@@ -47,3 +48,8 @@ one per folder in `categories/` (named `<parent>_<folder>.png`).
 
 Helldivers 2 and its stratagems belong to Arrowhead Game Studios and Sony
 Interactive Entertainment. This is an unofficial fan project.
+
+The gambling sounds ("let's go gambling!", the reel clicks, "aw dang it") in
+`assets/sfx/gamble/` are short cuts from
+[gamblecore: the complete series (1-7)](https://www.youtube.com/watch?v=wUH7wTPtvy8)
+by Bubbly (バブリー).

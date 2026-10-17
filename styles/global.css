@@ -25,3 +25,40 @@ img {
 button {
     font: inherit;
 }
+
+/* Buttons to the other pages (game / viewer), pinned top-left on
+   every page. Styled after the arcade's Reveal button; no keyboard shortcut. */
+#pages {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 5;
+    display: flex;
+    gap: .6rem;
+}
+
+.page-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .55rem;
+    padding: .3rem .9rem .3rem .35rem;
+    font-family: HD, sans-serif;
+    font-size: .8rem;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: #8fa0c0;
+    background: #1b2a4d;
+    border: 1px solid #3a4a6b;
+    border-radius: .2rem;
+    box-shadow: 0 0 .8rem #000;
+}
+
+.page-btn img {
+    width: 38px; /* 19px art, 2x */
+    height: 38px;
+}
+
+.page-btn:hover {
+    color: #fff;
+    border-color: #e8c860;
+}

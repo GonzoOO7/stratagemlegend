@@ -20,9 +20,15 @@ let misses = 0;
 let revealed = false;
 
 // Draw without replacement: every enabled stratagem comes up once before any of
-// them can repeat. The bag refills (and reshuffles) once it runs dry, so a repeat
-// is still possible across the cycle boundary - just never back to back.
+// them can repeat. The bag refills (and reshuffles) once it runs dry.
+//
+// The bag survives a reload: it is saved with the stratagem on screen, and a
+// reload brings that same round back - a stratagem never answered is not done.
+// Stratagems added to the data later join at the next refill.
+const BAG_STORE = "stratagemlegend.bag";
 let bag = [];
+let bagLoaded = false;
+let resumed = null;         // the round that was on screen when the page was left
 
 // Where the answer must be, as far as the misses have told: the deepest folder
 // known to hold it ([] = nothing known yet). Everything outside it is greyed.
@@ -37,7 +43,33 @@ function refillBag() {
     bag = shuffle(dealable().map(s => s.id));
 }
 
+function loadBag() {
+    bagLoaded = true;
+    try {
+        const saved = JSON.parse(localStorage.getItem(BAG_STORE));
+        const known = new Set(dealable().map(s => s.id));
+        if (saved && Array.isArray(saved.bag)) bag = saved.bag.filter(id => known.has(id));
+        if (saved && known.has(saved.current)) resumed = saved.current;
+    } catch {
+        // unreadable or blocked storage: start a fresh cycle
+    }
+}
+
+function saveBag() {
+    try {
+        localStorage.setItem(BAG_STORE, JSON.stringify({bag, current: target ? target.id : null}));
+    } catch {
+        // storage blocked: the cycle just won't survive a reload
+    }
+}
+
 function drawStratagem() {
+    if (!bagLoaded) loadBag();
+    if (resumed) {
+        const id = resumed;
+        resumed = null;
+        return Data.byId[id];
+    }
     if (bag.length === 0) refillBag();
     return Data.byId[bag.shift()];
 }
@@ -67,6 +99,7 @@ async function nextStratagem() {
     knownFolder = [];
     revealed = false;
     target = drawStratagem();
+    saveBag();
     places = targetPaths();
     renderCode(target);
     navigate([]);

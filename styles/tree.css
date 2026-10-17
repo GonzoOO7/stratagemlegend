@@ -39,8 +39,17 @@ body.tree-page {
     filter: brightness(1.6);
 }
 
-#wheel .cell.folder {
+#wheel .cell.folder,
+#wheel .cell.stratagem {
     cursor: pointer;
+}
+
+/* The wheel zooming away while diving into a stratagem: driven from JS. */
+#wheel .scene.leaving {
+    animation: none;
+    pointer-events: none;
+    transform-box: view-box;    /* SVG's own default, so the JS transform */
+    transform-origin: 0 0;      /* zooms around the clicked cell, not here */
 }
 
 /* Every refocus grows the new wheel out of the hub. */
@@ -93,7 +102,8 @@ body.tree-page {
     fill: #e8c860;
 }
 
-#wheel .hub .hint {
+#wheel .hub .hint,
+#wheel .hub .prefix {
     fill: #8fa0c0;
 }
 

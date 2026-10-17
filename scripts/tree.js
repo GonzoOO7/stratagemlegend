@@ -25,6 +25,12 @@ let focus = null;
 let folderCells = new Map();
 let litCells = [];
 
+// The stratagem dived into: the rings are gone and the hub, blown up, shows
+// it alone. Its folder stays in `focus`, so going back lands right there.
+let selected = null;        // stratagem id
+const DIVE_SCALE = 3;       // hub size when it holds a stratagem
+const DIVE_MS = 300;
+
 // Ring geometry, recomputed for every focus.
 let leafR0 = 0;
 let ringW = 0;
@@ -161,7 +167,7 @@ function fitIcon(c) {
 // sectors and are sized to stay inside their own cell. Names live in the
 // tooltip only - the wheel itself carries no text.
 function cell(layers, c) {
-    const group = svgEl("g", {class: c.onClick ? "cell folder" : "cell"}, [
+    const group = svgEl("g", {class: c.info.id ? "cell stratagem" : "cell folder"}, [
         svgEl("path", {d: sectorPath(c.r0, c.r1, c.a0, c.a1), fill: c.fill})
     ]);
 
@@ -185,7 +191,7 @@ function cell(layers, c) {
     });
     if (c.onClick) {
         group.addEventListener("click", () => {
-            if (!justDragged) c.onClick();
+            if (!justDragged) c.onClick(group);
         });
     }
     layers.cells.appendChild(group);
@@ -233,53 +239,101 @@ function drawChildren(layers, node, depth, a0, a1, r1, fill) {
             fill: shade(hue, maxDepth + 1, i % 2 === 1),
             info: {id, path: node.path},
             icon: stratagemIcon(id),
-            maxIcon: 57
+            maxIcon: 57,
+            onClick: group => dive(id, group)
         });
     });
 }
 
-// The hub is the current folder, and clicking it goes one level up - the
-// wheel's "Back" tile. At the very top there is nowhere to go.
-function drawHub(layers) {
-    const atRoot = focus === rootNode;
-    const hubR = CENTER_R - 6;
-    // Each line shrinks until it fits across the circle at its height.
-    const line = (y, s, cls, fontSize) => {
-        const text = s.toUpperCase();
-        const room = 2 * Math.sqrt(Math.max(hubR * hubR - y * y, 0)) - 14;
-        while (fontSize > 6 && textWidth(text, fontSize) > room) fontSize -= 0.5;
-        const t = svgEl("text", {
-            x: 0, y, "text-anchor": "middle", "font-size": fontSize, class: cls || ""
-        });
-        t.textContent = text;
-        return t;
+// --- hub ---------------------------------------------------------------------
+
+const HUB_R = CENTER_R - 6;
+
+// One line of hub text, shrunk until it fits across the circle at its height.
+function hubLine(y, s, cls, fontSize) {
+    const text = s.toUpperCase();
+    const room = 2 * Math.sqrt(Math.max(HUB_R * HUB_R - y * y, 0)) - 14;
+    while (fontSize > 6 && textWidth(text, fontSize) > room) fontSize -= 0.5;
+    const t = svgEl("text", {
+        x: 0, y, "text-anchor": "middle", "font-size": fontSize, class: cls || ""
+    });
+    t.textContent = text;
+    return t;
+}
+
+// A stratagem's name: one line if it reads at 8px or more, otherwise split
+// into the two most even halves. Returns the lines and where the next row goes.
+function hubName(name, y) {
+    const one = hubLine(y + 6, name, "", 10);
+    if (Number(one.getAttribute("font-size")) >= 8 || !name.includes(" ")) {
+        return {lines: [one], below: y + 13};
+    }
+    const words = name.split(" ");
+    let best = null;
+    for (let i = 1; i < words.length; i++) {
+        const halves = [words.slice(0, i).join(" "), words.slice(i).join(" ")];
+        const width = Math.max(...halves.map(h => h.length));
+        if (!best || width < best.width) best = {width, halves};
+    }
+    return {
+        lines: [hubLine(y, best.halves[0], "", 9), hubLine(y + 10, best.halves[1], "", 9)],
+        below: y + 15
     };
+}
 
-    const hub = svgEl("g", {class: atRoot ? "hub off" : "hub"}, [
-        svgEl("circle", {r: hubR})
-    ]);
+// The hub shows the stratagem dived into, otherwise the current folder.
+// Clicking it goes back: out of the stratagem to its folder, or one level up -
+// the wheel's "Back" tile. At the very top there is nowhere to go.
+function buildHub() {
+    const atRoot = focus === rootNode;
+    const live = !atRoot || selected;
+    const content = svgEl("g", {}, [svgEl("circle", {r: HUB_R})]);
+    const hub = svgEl("g", {class: live ? "hub" : "hub off"}, [content]);
+    // A stratagem has the whole wheel to itself: draw the hub blown up.
+    if (selected) content.setAttribute("transform", `scale(${DIVE_SCALE})`);
 
-    if (atRoot) {
-        hub.append(line(-4, "Stratagem", "", 11), line(10, "Legend", "", 11),
-                   line(26, `${Data.stratagems.length} codes`, "count", 8));
+    if (selected) {
+        const s = Data.byId[selected];
+        content.append(svgEl("image", {
+            href: stratagemIcon(s.id), x: -17, y: -52, width: 34, height: 34
+        }));
+        if (s.prefix) content.append(hubLine(-8, s.prefix, "prefix", 7));
+        const name = hubName(s.name, 0);
+        content.append(...name.lines);
+
+        const keys = [...s.code];
+        const room = 2 * Math.sqrt(HUB_R * HUB_R - (name.below + 12) ** 2) - 14;
+        const size = Math.min(12, room / keys.length - 1);
+        const left = -(keys.length * (size + 1) - 1) / 2;
+        keys.forEach((k, i) => content.append(svgEl("image", {
+            href: Sprites.arrows[k], x: left + i * (size + 1), y: name.below, width: size, height: size
+        })));
+        content.append(hubLine(48, "back", "hint", 7));
+    } else if (atRoot) {
+        content.append(hubLine(-4, "Stratagem", "", 11), hubLine(10, "Legend", "", 11),
+                   hubLine(26, `${Data.stratagems.length} codes`, "count", 8));
     } else {
-        hub.append(
+        content.append(
             svgEl("image", {href: Paths.ui + "back.png", x: -12, y: -40, width: 24, height: 24}),
-            line(2, focus.name, "", 11),
-            line(16, `${focus.weight} stratagems`, "count", 8),
-            line(34, "back", "hint", 7)
+            hubLine(2, focus.name, "", 11),
+            hubLine(16, `${focus.weight} stratagems`, "count", 8),
+            hubLine(34, "back", "hint", 7)
         );
+    }
+
+    if (live) {
         hub.addEventListener("click", () => {
-            if (!justDragged) goUp();
+            if (!justDragged) back();
         });
     }
-    layers.marks.appendChild(hub);
+    return hub;
 }
 
 function drawCrumbs() {
     crumbs.replaceChildren();
     const trail = [{name: "Stratagem Legend", path: []}];
     focus.path.forEach((name, i) => trail.push({name, path: focus.path.slice(0, i + 1)}));
+    if (selected) trail.push({name: Data.byId[selected].name, path: null});
     trail.forEach((step, i) => {
         if (i) crumbs.appendChild(el("span", "sep", {textContent: "›"}));
         const crumb = el("span", "crumb", {textContent: step.name});
@@ -320,23 +374,54 @@ function draw() {
     layout();
     folderCells = new Map();
     litCells = [];
-    const layers = {cells: svgEl("g"), marks: svgEl("g")};
-    const fill = shade(hueOf(focus.path), 0, false);
-    drawChildren(layers, focus, 0, START, START + FULL, CENTER_R, fill);
-    drawHub(layers);
-
-    const scene = svgEl("g", {class: "scene"}, [layers.cells, layers.marks]);
-    wheel.replaceChildren(scene);
+    hideTip();
+    let scene;
+    if (selected) {
+        scene = svgEl("g", {class: "scene"}, [buildHub()]);
+    } else {
+        const layers = {cells: svgEl("g"), marks: svgEl("g")};
+        const fill = shade(hueOf(focus.path), 0, false);
+        drawChildren(layers, focus, 0, START, START + FULL, CENTER_R, fill);
+        layers.marks.appendChild(buildHub());
+        scene = svgEl("g", {class: "scene"}, [layers.cells, layers.marks]);
+    }
+    const old = wheel.querySelector(".scene");
+    wheel.replaceChildren(...(old && old.classList.contains("leaving") ? [old] : []), scene);
     drawCrumbs();
     resetView();
+}
+
+// Clicking a stratagem dives into it: the wheel zooms in towards that cell and
+// fades away, and the hub comes back holding just the stratagem.
+function dive(id, group) {
+    const old = wheel.querySelector(".scene");
+    const box = group.getBBox();
+    const cx = box.x + box.width / 2;
+    const cy = box.y + box.height / 2;
+    old.classList.add("leaving");
+    const t0 = performance.now();
+    (function frame(now) {
+        const t = Math.min((now - t0) / DIVE_MS, 1);
+        const k = 1 + (DIVE_SCALE * 2 - 1) * t * t;
+        old.setAttribute("transform", `translate(${cx} ${cy}) scale(${k}) translate(${-cx} ${-cy})`);
+        old.style.opacity = 1 - t;
+        if (t < 1) requestAnimationFrame(frame);
+        else old.remove();
+    })(t0);
+
+    selected = id;
+    clearLit();
+    playSfx("click").catch(() => {});
+    draw();
 }
 
 // --- navigation --------------------------------------------------------------
 
 function focusOn(path) {
     const next = find(path);
-    if (next === focus) return;
+    if (next === focus && !selected) return;
     focus = next;
+    selected = null;
     hideTip();
     playSfx("click").catch(() => {});
     draw();
@@ -346,10 +431,21 @@ function goUp() {
     if (focus.path.length) focusOn(focus.path.slice(0, -1));
 }
 
+// The hub's click: out of the stratagem back to its folder, or up a level.
+function back() {
+    if (selected) {
+        selected = null;
+        playSfx("click").catch(() => {});
+        draw();
+    } else {
+        goUp();
+    }
+}
+
 document.addEventListener("keydown", event => {
     if (event.key === "Backspace" || event.key === "Escape") {
         event.preventDefault();
-        goUp();
+        back();
     }
 });
 

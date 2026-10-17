@@ -366,7 +366,8 @@ const Wheel = (() => {
     // a pan once the mouse has moved a few pixels, so plain clicks still reach
     // the cells - and the click that ends a pan is flagged (`justDragged`) so
     // callers can ignore it. `onPanStart` runs when a pan begins.
-    function zoomable(svg, {onPanStart} = {}) {
+    // minWidth: the narrowest view (deepest zoom), in SVG units.
+    function zoomable(svg, {onPanStart, minWidth = 60} = {}) {
         let view = null;
         let press = null;
         let dragging = false;
@@ -392,7 +393,7 @@ const Wheel = (() => {
         svg.addEventListener("wheel", event => {
             event.preventDefault();
             const dy = event.deltaMode === 1 ? event.deltaY * 33 : event.deltaY;
-            const w = Math.min(Math.max(view.w * Math.exp(dy * 0.0015), 60), full * 2);
+            const w = Math.min(Math.max(view.w * Math.exp(dy * 0.0015), minWidth), full * 2);
             const k = w / view.w;
             const p = toSvg(event);
             setView({x: p.x - (p.x - view.x) * k, y: p.y - (p.y - view.y) * k, w});
@@ -431,9 +432,16 @@ const Wheel = (() => {
             });
         }
 
+        // Centre the view on (x, y), `w` units wide.
+        function zoomTo(x, y, w) {
+            w = Math.min(Math.max(w, minWidth), full * 2);
+            setView({x: x - w / 2, y: y - w / 2, w});
+        }
+
         reset();
         return {
             reset,
+            zoomTo,
             get dragging() { return dragging; },
             get justDragged() { return justDragged; }
         };

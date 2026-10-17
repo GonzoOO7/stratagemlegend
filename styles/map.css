@@ -1,0 +1,102 @@
+/* The code map page (map.html). Page layout, help line and tooltip are shared
+   with the wheel pages, in wheel.css. */
+
+#map {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    user-select: none;
+    touch-action: none;
+}
+
+#map.dragging {
+    cursor: grabbing;
+}
+
+/* under the page buttons: the turn slider */
+#legend {
+    position: fixed;
+    top: 5rem;
+    left: 1rem;
+    z-index: 5;
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: .3rem .6rem;
+    align-items: baseline;
+    width: 17rem;
+    padding: .6rem .8rem;
+    font-family: HD, sans-serif;
+    font-size: .75rem;
+    text-transform: uppercase;
+    color: #7d8fb5;
+    background: #1b2a4d;
+    border: 1px solid #3a4a6b;
+    border-radius: .3rem;
+}
+
+#turn-label {
+    color: #fff;
+    font-size: .9rem;
+    text-transform: none;
+    white-space: nowrap;
+}
+
+#turn {
+    grid-column: 1 / -1;
+    width: 100%;
+    accent-color: #e8c860;
+    cursor: pointer;
+}
+
+#legend .ends {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: space-between;
+    margin-top: -.3rem;
+    font-size: .6rem;
+    color: #4a5a80;
+}
+
+/* one curve per arrow of a code */
+.codemap .edge {
+    fill: none;
+    stroke: #3a4a6b;
+    stroke-linecap: round;
+}
+
+/* the way to the hovered icon: its code */
+.codemap .edge.on {
+    stroke: #fff;
+}
+
+/* pixel art: crisp at any zoom, not smeared */
+.codemap image {
+    image-rendering: pixelated;
+}
+
+/* the group, not each arrow: hovering sets each arrow's own opacity */
+.codemap .arrows {
+    opacity: .45;
+}
+
+.codemap .arrows image {
+    pointer-events: none;
+}
+
+/* the fade by distance while hovering (set from map.js) */
+.codemap .edge,
+.codemap image {
+    transition: opacity .15s, filter .15s;
+}
+
+.codemap .start {
+    fill: #e8c860;
+}
+
+.codemap image.strat {
+    cursor: pointer;
+}
+
+.codemap image.strat:hover {
+    filter: brightness(1.4) drop-shadow(0 0 2px #fff);
+}

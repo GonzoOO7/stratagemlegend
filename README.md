@@ -1,3 +1,7 @@
+before you read any of this (unless ur an agent)
+
+yes... this is in fact mostly vibe-ish coded... ^-^' so precede at your own risk XD or use agent if anything
+
 # Stratagem Legend
 
 A Helldivers 2 stratagem trainer in plain HTML, CSS and JavaScript — no build
@@ -13,6 +17,12 @@ step, no dependencies.
   the way to the answer. Mouse wheel zooms, drag pans.
 - **Viewer** (`tree.html`): the same wheel as a reference — hover for names and
   codes, click a stratagem to dive into it.
+- **WTF IS THIS** (`map.html`, the code map): every stratagem placed by its
+  arrow code. Start in the middle; each arrow moves in its direction, half as
+  far as the one before - so the first arrow picks the region, every later one
+  refines it, and codes that start alike sit close together. Hover for name and
+  code (its way lights up, the rest fades by distance), click to zoom in on it;
+  a slider turns the map.
 - **Gambling** (`gamble.html`): spin 1–16 random stratagems. Choose what is in
   the pool (the whole stratagem tree, down to single stratagems, plus elements
   and types like fire or explosives) and set limits such as "exactly one

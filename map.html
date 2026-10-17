@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Stratagem Legend · WTF IS THIS</title>
+    <link rel="icon" href="assets/icons/stratagems/tesla_tower.png" type="image/png">
+    <link href="styles/global.css" rel="stylesheet">
+    <link href="styles/wheel.css" rel="stylesheet">
+    <link href="styles/map.css" rel="stylesheet">
+</head>
+<body id="page" class="wheel-page map-page">
+<nav id="pages">
+    <a class="page-btn" href="index.html">
+        <img src="assets/icons/categories/offensive_eagle.png" alt="">game
+    </a>
+    <a class="page-btn" href="tree.html">
+        <img src="assets/icons/ui/viewer.png" alt="">viewer
+    </a>
+    <span class="page-btn current" aria-current="page">
+        <img src="assets/icons/stratagems/tesla_tower.png" alt="">WTF IS THIS
+    </span>
+    <a class="page-btn" href="gamble.html">
+        <img src="assets/icons/stratagems/resupply.png" alt="">gambling
+    </a>
+</nav>
+<div id="legend">
+    <span>turn</span>
+    <span id="turn-label"></span>
+    <input id="turn" type="range" min="-180" max="180" step="any" title="double click: back to -45°">
+    <span class="ends"><span>-180°</span><span>180°</span></span>
+</div>
+<svg id="map" class="codemap"></svg>
+<div id="help">hover for name and code · click an icon to zoom in on it · esc to zoom out · wheel to zoom · drag to pan</div>
+<div id="tip" hidden></div>
+</body>
+<script src="scripts/settings.js"></script>
+<script src="scripts/util.js"></script>
+<script src="scripts/data.js"></script>
+<script src="scripts/wheel.js"></script>
+<script src="scripts/map.js"></script>
+</html>

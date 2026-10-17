@@ -118,7 +118,6 @@ function draw() {
     }
     const old = wheel.querySelector(".scene");
     wheel.replaceChildren(...(old && old.classList.contains("leaving") ? [old] : []), scene);
-    hideBlankIcons(scene);
     drawCrumbs();
     zoom.reset();
 }

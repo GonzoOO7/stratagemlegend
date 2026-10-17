@@ -72,7 +72,6 @@ function renderScreen() {
     drawn.marks.appendChild(hub);
 
     wheel.replaceChildren(Wheel.svgEl("g", {class: "scene"}, [drawn.cells, drawn.marks]));
-    hideBlankIcons(wheel);
     zoom.reset();
     applyEliminated();
     applyTrace();

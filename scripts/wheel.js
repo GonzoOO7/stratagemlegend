@@ -140,11 +140,14 @@ const Wheel = (() => {
         const arc = rm * Math.min(c.a1 - c.a0, Math.PI);
         const pad = Math.min(3, depth * 0.06, arc * 0.06);
 
-        for (let size = Math.min(c.maxIcon, depth * 0.85); size >= 6; size *= 0.92) {
+        for (let size = Math.min(c.maxIcon, depth * 0.85); size >= 3; size *= 0.92) {
             const box = {x0: cx - size / 2, y0: cy - size / 2, x1: cx + size / 2, y1: cy + size / 2};
             if (boxFits(box, c, pad)) return {x: box.x0, y: box.y0, size};
         }
-        return null;
+        // A cell too thin for any whole icon (the full wheel's narrowest
+        // stratagems): still show one, small, in its middle - zoom to read it.
+        const size = Math.max(2, Math.min(depth, arc) * 0.8);
+        return {x: cx - size / 2, y: cy - size / 2, size};
     }
 
     // One line of hub text, shrunk until it fits across the circle at its height.
@@ -170,13 +173,12 @@ const Wheel = (() => {
     // Every cell group carries `.info` ({path, weight} or {id, path}) and
     // `.icon` (its image, if one fitted), so callers can decorate them.
     function render(focus, hooks = {}) {
+        // Every ring is equally high: one per folder level, plus one for the
+        // stratagems of the deepest folders. Each folder is one ring high and
+        // its stratagems sit in the very next ring - so a short branch ends
+        // earlier than a deep one, and the outer edge is ragged.
         const maxDepth = depthOf(focus.subs);
-        // The stratagem ring gets wider when there are few stratagems (so
-        // their cells stay roughly square); the category rings share the rest.
-        const square = FULL * OUTER_R / focus.weight;
-        const leafW = maxDepth ? Math.min(Math.max(square, 44), 110) : OUTER_R - CENTER_R;
-        const leafR0 = OUTER_R - leafW;
-        const ringW = maxDepth ? (leafR0 - CENTER_R) / maxDepth : 0;
+        const ringW = (OUTER_R - CENTER_R) / (maxDepth + 1);
 
         const cells = svgEl("g");
         const marks = svgEl("g");
@@ -247,8 +249,7 @@ const Wheel = (() => {
 
         function drawNode(node, depth, a0, a1, alt) {
             const r0 = CENTER_R + (depth - 1) * ringW;
-            // A folder with nothing but stratagems reaches all the way out.
-            const r1 = node.subs.length ? r0 + ringW : leafR0;
+            const r1 = r0 + ringW;
             const fill = shade(hueOf(node.path), depth, alt);
             cell({
                 r0, r1, a0, a1, fill, node,
@@ -268,14 +269,12 @@ const Wheel = (() => {
                 a += span;
             });
 
-            // A folder holding both subfolders and stratagems (Tesla Tower in
-            // Emplacement): its stratagems stay in the outer ring with all the
-            // others, and the gap between them and the folder is left open -
-            // transparent, no empty panel.
+            // Its stratagems: the ring right after the folder (`r1` is the
+            // folder's outer edge) - next to its subfolders, if it has any.
             const hue = hueOf(node.path);
             node.leaves.forEach((id, i) => {
                 cell({
-                    r0: leafR0, r1: OUTER_R, a0: a + per * i, a1: a + per * (i + 1),
+                    r0: r1, r1: r1 + ringW, a0: a + per * i, a1: a + per * (i + 1),
                     fill: shade(hue, maxDepth + 1, i % 2 === 1),
                     info: {id, path: node.path},
                     icon: stratagemIcon(id),

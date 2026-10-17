@@ -43,31 +43,48 @@ function renderBreadcrumb() {
     }
 }
 
-function addTile(tile, onActivate) {
+// Every icon acknowledges the click with the arrow-complete sound. Correct
+// stratagems add the completion sound on top (from answer()), so the two
+// layer rather than replace each other.
+function addTile(tile, onActivate, into) {
     tile.addEventListener("click", () => {
-        if (!locked) onActivate();
+        if (locked) return;
+        playSfx("click");
+        onActivate();
     });
-    screen.appendChild(tile);
+    into.appendChild(tile);
     selectable.push(tile);
 }
 
+// The screen is a two-column, two-row grid:
+//
+//     a b      a = Back, alone in the left column
+//     a c      b = category tiles    c = stratagem tiles
+//
+// The dashed rule between b and c comes from the row gap on .grid-strats.
 function renderScreen() {
     const node = nodeChildren(currentPath);
     screen.replaceChildren();
     selectable = [];
     folderPaths = [];
 
+    const back = el("div", "grid-back");
+    const cats = el("div", "grid-cats");
+    const stratagems = el("div", "grid-strats");
+    screen.append(back, cats, stratagems);
+
     const subcategories = nodeSubcategories(node);
     const stratagemIds = nodeStratagems(node);
 
-    // "cd .." — one level up, only once there is somewhere to go. Sits as the
-    // first tile of the top row, alongside the category tiles.
+    // "cd .." — one level up, only once there is somewhere to go.
     if (currentPath.length) {
         const up = [...currentPath.slice(0, -1)];
         addTile(el("div", "tile nav", {title: "Back"}, [
             el("img", "", {src: Paths.ui + "back.png", alt: "Back"}),
             el("span", "label", {textContent: "Back"})
-        ]), () => navigate(up));
+        ]), () => navigate(up), back);
+    } else {
+        back.classList.add("empty");
     }
 
     for (const sub of subcategories) {
@@ -76,13 +93,9 @@ function renderScreen() {
         addTile(el("div", "tile folder", {title: sub.name}, [
             el("img", "", {src: Paths.categories + categoryIconPath(childPath), alt: ""}),
             el("span", "label", {textContent: sub.name})
-        ]), () => navigate(childPath));
+        ]), () => navigate(childPath), cats);
     }
-
-    // Only worth drawing when the view actually holds both kinds.
-    if (subcategories.length && stratagemIds.length) {
-        screen.appendChild(el("div", "separator"));
-    }
+    if (subcategories.length) stratagems.classList.add("ruled");
 
     for (const id of stratagemIds) {
         const stratagem = Data.byId[id];
@@ -92,7 +105,7 @@ function renderScreen() {
             el("span", "label", {textContent: label})
         ]);
         tile.dataset.id = id;
-        addTile(tile, () => answer(id, tile));
+        addTile(tile, () => answer(id, tile), stratagems);
     }
 
     // Remember where WASD movement starts from — the first real tile, never the

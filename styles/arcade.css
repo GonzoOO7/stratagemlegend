@@ -96,19 +96,59 @@
 
 /* --- folder grid ---------------------------------------------------------- */
 
+/* a b
+   a c   — Back alone in the left column, categories above stratagems. */
 #screen {
+    display: grid;
+    grid-template-areas:
+        "a b"
+        "a c";
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    column-gap: 1.2rem;
+    overflow: hidden;
+}
+
+.grid-back,
+.grid-cats,
+.grid-strats {
     display: flex;
     flex-wrap: wrap;
     align-content: flex-start;
     gap: 1.2rem;
-    overflow-y: auto;
+    min-width: 0;
 }
 
-.separator {
-    flex-basis: 100%;
-    height: 0;
-    margin: .3rem 0;
+.grid-back {
+    grid-area: a;
+    width: 6rem;
+}
+
+/* No way back from the root, so the column goes away. */
+.grid-back.empty {
+    display: none;
+}
+
+.grid-cats {
+    grid-area: b;
+}
+
+/* The stratagem list is the long one: it scrolls, categories stay put.
+   Only ruled off from the categories when there actually are some. */
+.grid-strats {
+    grid-area: c;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+.grid-strats.ruled {
     border-top: 1px dashed #2b3a5e;
+    margin-top: .3rem;
+    padding-top: 1.2rem;
+}
+
+.grid-cats:empty {
+    display: none;
 }
 
 .tile {
@@ -138,6 +178,12 @@
     border-radius: .2rem;
 }
 
+/* The Back tile owns the left column for the full height, ruled off from
+   the tiles beside it. */
+.tile.nav {
+    width: 6rem;
+}
+
 .tile.nav img {
     outline: 1px solid #3a4a6b;
     outline-offset: .35rem;
@@ -148,6 +194,7 @@
 .tile.nav:hover img {
     opacity: 1;
 }
+
 
 /* Keyboard selection: BACK's outline form, in gold, at 2px. */
 .tile.selected img {

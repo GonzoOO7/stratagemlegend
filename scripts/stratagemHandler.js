@@ -138,7 +138,8 @@ async function answer(id, tile) {
     accepting = false;
     locked = true;
     flash(tile, "correct", 500);
-    playSfx("correct");
+    // The click sound is still ringing; let the completion land on top of it.
+    setTimeout(() => playSfx("correct"), 120);
     // A revealed round was already given up — no streak credit for walking a
     // path that was handed to you.
     if (!revealed) {

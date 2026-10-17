@@ -144,10 +144,10 @@
                 "stratagemIds": [
                   "anti_materiel_rifle",
                   "railgun",
+                  "grenade_launcher",
                   "stalwart",
                   "machine_gun",
                   "heavy_machine_gun",
-                  "grenade_launcher",
                   "laser_cannon",
                   "quasar_cannon",
                   "flamethrower",
@@ -300,6 +300,9 @@
       {
         "id": "emplacement",
         "name": "Emplacement",
+        "stratagemIds": [
+          "tesla_tower"
+        ],
         "subcategories": [
           {
             "id": "mines",

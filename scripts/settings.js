@@ -3,6 +3,7 @@
 const sfxVolume = 0.25;
 
 const Sfx = {
+    click: "/assets/sfx/arrow complete.ogg",
     correct: "/assets/sfx/stratagem finish.ogg",
     wrong: "/assets/sfx/arrow fail.ogg"
 };

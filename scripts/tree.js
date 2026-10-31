@@ -53,8 +53,10 @@ function buildHub() {
         const s = Data.byId[selected];
         const content = svgEl("g", {transform: `scale(${DIVE_SCALE})`}, [svgEl("circle", {r: HUB_R})]);
         hub = svgEl("g", {class: "hub"}, [content]);
+        // 34 units of 19px art; the icon is 21px (1px transparent margin)
+        const icon = 34 * 21 / 19;
         content.append(svgEl("image", {
-            href: stratagemIcon(s.id), x: -17, y: -52, width: 34, height: 34
+            href: stratagemIcon(s.id), x: -icon / 2, y: -35 - icon / 2, width: icon, height: icon
         }));
         if (s.prefix) content.append(hubLine(-8, s.prefix, "prefix", 7));
         const name = hubName(s.name, 0);

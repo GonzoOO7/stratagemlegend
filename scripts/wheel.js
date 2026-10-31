@@ -217,8 +217,12 @@ const Wheel = (() => {
 
             const fit = c.icon && fitIcon(c);
             if (fit) {
+                // The fit is for the 19px art; a stratagem icon is 21px (a 1px
+                // transparent margin), so its box grows around the art.
+                const size = c.info.id ? fit.size * 21 / 19 : fit.size;
+                const over = (size - fit.size) / 2;
                 group.icon = svgEl("image", {
-                    href: c.icon, x: fit.x, y: fit.y, width: fit.size, height: fit.size
+                    href: c.icon, x: fit.x - over, y: fit.y - over, width: size, height: size
                 });
                 marks.appendChild(group.icon);
             }

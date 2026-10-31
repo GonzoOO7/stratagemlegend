@@ -11,7 +11,7 @@
 
 const MIN_SLOTS = 1;
 const MAX_SLOTS = 16;
-const ART = 19;             // stratagem art is 19px; icons scale by whole steps
+const ART = 19;             // icon art is 19px (stratagem PNGs add a 1px transparent margin, gamble.css); icons scale by whole steps
 const REEL_MAX = 144;       // px, the full-size reel
 const REEL_GRID = 76;       // px, reel size in the 4x4 grid (57px icons, 3x)
 const LABEL_MIN = 128;      // px of column width needed to show name and code

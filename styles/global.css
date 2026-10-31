@@ -58,6 +58,16 @@ button {
     height: 38px;
 }
 
+/* Stratagem icons are 21px: the 19px art plus a 1px transparent margin. At
+   the same 2x they are 42px, the margin hanging over (-2px), so the art sits
+   exactly where a 19px icon's would. The same trick wherever they share a
+   spot with 19px category/ui icons. */
+.page-btn img[src*="/stratagems/"] {
+    width: 42px;
+    height: 42px;
+    margin: -2px;
+}
+
 a.page-btn:hover {
     color: #fff;
     border-color: #e8c860;

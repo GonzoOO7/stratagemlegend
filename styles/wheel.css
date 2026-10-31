@@ -179,6 +179,13 @@ body.wheel-page {
     height: 57px;
 }
 
+/* stratagem icons: 21px with the 1px transparent margin (see global.css) */
+#tip .icon[src*="/stratagems/"] {
+    width: 63px;
+    height: 63px;
+    margin: -3px;
+}
+
 #tip .path {
     font-size: .6rem;
 }

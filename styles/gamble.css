@@ -53,6 +53,14 @@
     filter: drop-shadow(0 0 .6rem #000);
 }
 
+/* stratagem icons are 21px, 1px transparent margin around the 19px art: the
+   same scale, the margin hanging over (see global.css) */
+.slot .icon[src*="/stratagems/"] {
+    width: calc(var(--icon, 114px) * 21 / 19);
+    height: calc(var(--icon, 114px) * 21 / 19);
+    margin: calc(var(--icon, 114px) / -19);
+}
+
 .slot.rolling .icon {
     animation: roll .07s linear infinite alternate;
     opacity: .85;
@@ -430,6 +438,12 @@
     flex: none;
     width: 38px; /* 19px art, 2x */
     height: 38px;
+}
+
+.trow img[src*="/stratagems/"] {
+    width: 42px; /* 21px stratagem icon, 2x, margin hanging over */
+    height: 42px;
+    margin: -2px;
 }
 
 .trow .name {

@@ -7,9 +7,11 @@
 // arrow - so the way into a cell is a code. A cell whose way is a whole
 // stratagem code is that stratagem's icon; a cell no code goes through stays
 // empty. Deeper cells sit on top of the ones they are in and get lighter.
+// The corners are never used, so each cell is drawn as a cross - the middle
+// and its four arms - and the next level's crosses sit in its arms.
 //
 // With "collapse" on, an arrow that has no other way beside it (no fork) gets
-// no square of its own: the next square takes the whole cell instead of a
+// no cell of its own: the next cell takes the whole space instead of a
 // third of it. So a run of arrows without a crossing is one step, and a
 // code's tail after its last fork lands as one big icon. The readout shows the
 // skipped arrows dimmed.
@@ -21,6 +23,7 @@ const svg = document.getElementById("map");
 const tip = document.getElementById("tip");
 const readout = document.getElementById("where");
 const collapseBox = document.getElementById("collapse");
+const hoverBox = document.getElementById("hover");
 const {svgEl} = Wheel;
 const tips = Wheel.tooltip(tip, {codes: true});
 // Deep zoom: a 9-arrow code is 3^9 times smaller than the whole map.
@@ -32,13 +35,14 @@ const STORE = "stratagemlegend.map";
 // Where each arrow's cell sits in the 3x3, as a step from the middle.
 const DIR = {w: [0, -1], a: [-1, 0], d: [1, 0], s: [0, 1]};
 
-const cells = new Map();    // prefix -> {x, y, size, rect} (collapsed prefixes have none)
+const cells = new Map();    // prefix -> {x, y, size} (collapsed prefixes have none)
 let focus = "";             // the cell zoomed in on last
 
 // The colour of a cell by how deep it is: the root is the site's panel blue
-// (#1b2a4d), each level inward lighter - big steps first, smaller ones deeper
-// in (icons get a dark backing).
-const shade = depth => `hsl(222 ${48 - depth * 3}% ${(20 + 44 * (1 - 0.7 ** depth)).toFixed(1)}%)`;
+// (#1b2a4d), each level inward a little lighter - big steps first, smaller ones
+// deeper in. It never gets past ~38% lightness, so the icons (blue ones
+// especially) stay readable deep inside.
+const shade = depth => `hsl(222 ${48 - depth * 3}% ${(20 + 18 * (1 - 0.7 ** depth)).toFixed(1)}%)`;
 
 // A code as arrow images; `skipped` are the indexes of the arrows collapsed on
 // the way (shown dimmed).
@@ -50,6 +54,12 @@ function arrowImgs(code, skipped = new Set()) {
         if (skipped.has(i)) img.className = "skipped";
         return img;
     });
+}
+
+// A cell's cross: the middle third of its box both ways, one path.
+function crossPath({x, y, width: w}) {
+    const t = w / 3;
+    return `M${x + t} ${y}h${t}v${t}h${t}v${t}h${-t}v${t}h${-t}v${-t}h${-t}v${-t}h${t}z`;
 }
 
 const stratagemCount = n => n === 1 ? "1 stratagem" : `${n} stratagems`;
@@ -79,11 +89,6 @@ function showSquareTip(prefix, count, skipped, event) {
     tip.replaceChildren(text);
     tip.hidden = false;
     tips.move(event);
-}
-
-// The cells a code goes through light up while its icon is hovered.
-function light(code, on) {
-    for (let n = 1; n <= code.length; n++) cells.get(code.slice(0, n))?.rect?.classList.toggle("on", on);
 }
 
 function build() {
@@ -118,32 +123,29 @@ function build() {
             }
         }
         const box = {x: x - size / 2, y: y - size / 2, width: size, height: size};
-        const cell = {x, y, size, rect: null};
-        cells.set(prefix, cell);
+        cells.set(prefix, {x, y, size});
         const s = drawn.get(prefix);
 
         if (s) {
-            // The icon at 0 0 in its own 19x19 pixels, placed by a transform:
+            // The icon at 0 0 in its own 21x21 pixels (19px art and a 1px
+            // transparent margin, so neighbours never touch), placed by a transform:
             // Firefox rounds an <image>'s x/y/size to 1/60 of a unit, which at
             // deep zoom (cells far below 1 unit) shifts it off its cell by
             // whole screen pixels. A transform is not rounded.
-            const art = 19;
+            const art = 21;
             const place = svgEl("g", {
                 transform: `translate(${box.x} ${box.y}) scale(${size / art})`
             });
             const pixels = {x: 0, y: 0, width: art, height: art};
-            place.appendChild(svgEl("rect", {class: "backing", ...pixels}));
             const icon = svgEl("image", {class: "strat", href: stratagemIcon(s.id), ...pixels});
             place.appendChild(icon);
             const info = {id: s.id, path: Data.pathOf[s.id] || []};
             icon.addEventListener("mouseenter", e => {
-                light(prefix, true);
                 showWhere(s.code, undefined, skipped);
-                if (!zoom.dragging) tips.show(info, e);
+                if (hoverBox.checked && !zoom.dragging) tips.show(info, e);
             });
             icon.addEventListener("mousemove", tips.move);
             icon.addEventListener("mouseleave", () => {
-                light(prefix, false);
                 tips.hide();
             });
             icon.addEventListener("click", () => zoomIn(prefix));
@@ -151,17 +153,16 @@ function build() {
             return;
         }
 
-        // the root too: the whole map is one square
-        const rect = svgEl("rect", {class: "cell", fill: shade(depth), ...box});
+        // the root too: the whole map is one cross
+        const rect = svgEl("path", {class: "cell", fill: shade(depth), d: crossPath(box)});
         rect.addEventListener("mouseenter", e => {
             showWhere(prefix, below.get(prefix), skipped);
-            if (!zoom.dragging) showSquareTip(prefix, below.get(prefix), skipped, e);
+            if (hoverBox.checked && !zoom.dragging) showSquareTip(prefix, below.get(prefix), skipped, e);
         });
         rect.addEventListener("mousemove", tips.move);
         rect.addEventListener("mouseleave", () => tips.hide());
         rect.addEventListener("click", () => zoomIn(prefix));
         scene.appendChild(rect);
-        if (prefix !== "") cell.rect = rect;
         const third = size / 3;
         for (const key of ways(prefix)) {
             const [dx, dy] = DIR[key];
@@ -191,23 +192,42 @@ document.addEventListener("keydown", event => {
     zoomIn(up);
 });
 
-// --- the collapse option ---------------------------------------------------------
+// --- the options ------------------------------------------------------------------
 
-collapseBox.addEventListener("change", () => {
+// collapse: arrows without a fork get no cell of their own (rebuilds the map);
+// hover: the card at the cursor and the icons lighting up (the legend readout
+// stays either way).
+function savePrefs() {
     try {
-        localStorage.setItem(STORE, JSON.stringify({collapse: collapseBox.checked}));
+        localStorage.setItem(STORE, JSON.stringify({collapse: collapseBox.checked, hover: hoverBox.checked}));
     } catch {
         // storage blocked: the choice just won't survive a reload
     }
+}
+
+function applyHover() {
+    svg.classList.toggle("no-hover", !hoverBox.checked);
+    if (!hoverBox.checked) tips.hide();
+}
+
+collapseBox.addEventListener("change", () => {
+    savePrefs();
     zoom.reset();
     build();
 });
 
+hoverBox.addEventListener("change", () => {
+    savePrefs();
+    applyHover();
+});
+
 try {
-    const saved = JSON.parse(localStorage.getItem(STORE))?.collapse;
-    if (typeof saved === "boolean") collapseBox.checked = saved;
+    const saved = JSON.parse(localStorage.getItem(STORE)) || {};
+    if (typeof saved.collapse === "boolean") collapseBox.checked = saved.collapse;
+    if (typeof saved.hover === "boolean") hoverBox.checked = saved.hover;
 } catch {
-    // unreadable or blocked storage: the default (on, from map.html)
+    // unreadable or blocked storage: the defaults (both on, from map.html)
 }
+applyHover();
 
 loadData().then(build);

@@ -71,23 +71,10 @@
     cursor: pointer;
 }
 
-/* a square some code goes through; its fill (the depth) is set from map.js */
+/* a cross some code goes through; its fill (the depth) is set from map.js */
 .codemap .cell {
     shape-rendering: crispEdges;
     cursor: zoom-in;
-}
-
-/* the way to the hovered icon */
-.codemap .cell.on {
-    stroke: #e8c860;
-    stroke-width: 2px;
-    vector-effect: non-scaling-stroke;
-}
-
-/* behind each icon, so its white art reads on the light deep cells */
-.codemap .backing {
-    fill: #0f1418;
-    pointer-events: none;
 }
 
 /* pixel art: crisp at any zoom, not smeared */
@@ -95,10 +82,16 @@
     image-rendering: pixelated;
 }
 
+/* straight on the cell colour: no backing, no shadow */
 .codemap image.strat {
     cursor: pointer;
 }
 
 .codemap image.strat:hover {
-    filter: brightness(1.4) drop-shadow(0 0 2px #fff);
+    filter: brightness(1.4);
+}
+
+/* the hover option off (map.js) */
+.codemap.no-hover image.strat:hover {
+    filter: none;
 }

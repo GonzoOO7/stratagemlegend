@@ -13,16 +13,15 @@
     cursor: grabbing;
 }
 
-/* under the page buttons: the turn slider */
+/* under the page buttons: where the pointer is, and the cut option */
 #legend {
     position: fixed;
     top: 5rem;
     left: 1rem;
     z-index: 5;
-    display: grid;
-    grid-template-columns: auto auto;
-    gap: .3rem .6rem;
-    align-items: baseline;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
     width: 17rem;
     padding: .6rem .8rem;
     font-family: HD, sans-serif;
@@ -34,63 +33,66 @@
     border-radius: .3rem;
 }
 
-#turn-label {
-    color: #fff;
-    font-size: .9rem;
-    text-transform: none;
-    white-space: nowrap;
+/* the code of the square under the pointer, and how many stratagems are in it */
+#where {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .15rem;
+    min-height: 19px;
 }
 
-#turn {
-    grid-column: 1 / -1;
-    width: 100%;
+#where img {
+    width: 19px;
+    height: 19px;
+    image-rendering: pixelated;
+}
+
+/* arrows collapsed on the way (no fork there), in the readout and the hover card */
+#where img.skipped,
+#tip .code img.skipped {
+    opacity: .35;
+}
+
+#where span {
+    margin-left: .4rem;
+    color: #e8c860;
+}
+
+#legend label {
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    cursor: pointer;
+}
+
+#legend input {
     accent-color: #e8c860;
     cursor: pointer;
 }
 
-#legend .ends {
-    grid-column: 1 / -1;
-    display: flex;
-    justify-content: space-between;
-    margin-top: -.3rem;
-    font-size: .6rem;
-    color: #4a5a80;
+/* a square some code goes through; its fill (the depth) is set from map.js */
+.codemap .cell {
+    shape-rendering: crispEdges;
+    cursor: zoom-in;
 }
 
-/* one curve per arrow of a code */
-.codemap .edge {
-    fill: none;
-    stroke: #3a4a6b;
-    stroke-linecap: round;
+/* the way to the hovered icon */
+.codemap .cell.on {
+    stroke: #e8c860;
+    stroke-width: 2px;
+    vector-effect: non-scaling-stroke;
 }
 
-/* the way to the hovered icon: its code */
-.codemap .edge.on {
-    stroke: #fff;
+/* behind each icon, so its white art reads on the light deep cells */
+.codemap .backing {
+    fill: #0f1418;
+    pointer-events: none;
 }
 
 /* pixel art: crisp at any zoom, not smeared */
 .codemap image {
     image-rendering: pixelated;
-}
-
-/* the group, not each arrow: hovering sets each arrow's own opacity */
-.codemap .arrows {
-    opacity: .45;
-}
-
-.codemap .arrows image {
-    pointer-events: none;
-}
-
-/* the fade by distance while hovering (set from map.js) */
-.codemap .edge,
-.codemap image {
-    transition: opacity .15s, filter .15s;
-}
-
-.codemap .start {
-    fill: #e8c860;
 }
 
 .codemap image.strat {

@@ -24,13 +24,13 @@
     </a>
 </nav>
 <div id="legend">
-    <span>turn</span>
-    <span id="turn-label"></span>
-    <input id="turn" type="range" min="-180" max="180" step="any" title="double click: back to -45°">
-    <span class="ends"><span>-180°</span><span>180°</span></span>
+    <div id="where"></div>
+    <label title="an arrow with no other way beside it gets no square of its own - the next square fills the cell">
+        <input id="collapse" type="checkbox" checked> collapse arrows without a fork
+    </label>
 </div>
 <svg id="map" class="codemap"></svg>
-<div id="help">hover for name and code · click an icon to zoom in on it · esc to zoom out · wheel to zoom · drag to pan</div>
+<div id="help">hover for name and code · click a square to zoom in on it · esc to step back out · wheel to zoom · drag to pan</div>
 <div id="tip" hidden></div>
 </body>
 <script src="scripts/settings.js"></script>
